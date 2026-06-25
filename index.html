@@ -11,12 +11,20 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <header>
     <h1>🌸 Projets & Culture</h1>
+    <nav class="tabs">
+      <button class="tab active" onclick="showTab('accueil')">🏠 Accueil</button>
+      <button class="tab" onclick="showTab('livres')">📚 Livres</button>
+      <button class="tab" onclick="showTab('videos')">🎬 Vidéos</button>
+      <button class="tab" onclick="showTab('visites')">🏛️ Visites</button>
+    </nav>
   </header>
 
-  <main>
-    <!-- Japon -->
+  <!-- ACCUEIL -->
+  <main id="tab-accueil" class="tab-content active">
+
     <section class="card japan-card">
       <h2>✈️ Voyage au Japon</h2>
       <div class="progress-info">
@@ -34,7 +42,6 @@
       </div>
     </section>
 
-    <!-- Livres -->
     <section class="card">
       <h2>📚 Livres à lire</h2>
       <div class="add-item">
@@ -44,7 +51,6 @@
       <ul id="book-list" class="item-list"></ul>
     </section>
 
-    <!-- Vidéos -->
     <section class="card">
       <h2>🎬 Vidéos à regarder</h2>
       <div class="add-item">
@@ -54,7 +60,6 @@
       <ul id="video-list" class="item-list"></ul>
     </section>
 
-    <!-- Visites -->
     <section class="card">
       <h2>🏛️ Visites culturelles</h2>
       <div class="add-item">
@@ -63,6 +68,22 @@
       </div>
       <ul id="visit-list" class="item-list"></ul>
     </section>
+
+  </main>
+
+  <!-- ARCHIVES LIVRES -->
+  <main id="tab-livres" class="tab-content">
+    <div id="archive-books"></div>
+  </main>
+
+  <!-- ARCHIVES VIDÉOS -->
+  <main id="tab-videos" class="tab-content">
+    <div id="archive-videos"></div>
+  </main>
+
+  <!-- ARCHIVES VISITES -->
+  <main id="tab-visites" class="tab-content">
+    <div id="archive-visits"></div>
   </main>
 
   <script src="app.js"></script>

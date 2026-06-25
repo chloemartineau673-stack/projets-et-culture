@@ -15,7 +15,7 @@ header {
   background: #2d2d2d;
   color: white;
   text-align: center;
-  padding: 20px 16px;
+  padding: 16px 16px 0;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -23,19 +23,56 @@ header {
 }
 
 header h1 {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   letter-spacing: 1px;
+  margin-bottom: 12px;
 }
 
-main {
-  padding: 16px;
+/* TABS NAV */
+.tabs {
   display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  flex: 1;
+  min-width: 80px;
+  padding: 10px 8px;
+  background: transparent;
+  color: #aaa;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab.active {
+  color: white;
+  border-bottom: 3px solid #d4602a;
+}
+
+/* TAB CONTENT */
+.tab-content {
+  display: none;
+  padding: 16px;
   flex-direction: column;
   gap: 16px;
   max-width: 600px;
   margin: 0 auto;
 }
 
+.tab-content.active {
+  display: flex;
+}
+
+/* CARDS */
 .card {
   background: white;
   border-radius: 16px;
@@ -44,12 +81,12 @@ main {
 }
 
 .card h2 {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   margin-bottom: 14px;
   color: #2d2d2d;
 }
 
-/* Japan card */
+/* JAPAN */
 .japan-card {
   background: linear-gradient(135deg, #fff7f0, #ffe8d6);
   border: 1px solid #f4c9a4;
@@ -125,19 +162,12 @@ main {
   transition: background 0.2s;
 }
 
-.add-amount button:hover {
-  background: #b84f22;
-}
+.add-amount button:hover { background: #b84f22; }
 
-.btn-reset {
-  background: #aaa !important;
-}
+.btn-reset { background: #aaa !important; }
+.btn-reset:hover { background: #888 !important; }
 
-.btn-reset:hover {
-  background: #888 !important;
-}
-
-/* Lists */
+/* LISTS */
 .add-item {
   display: flex;
   gap: 8px;
@@ -173,9 +203,7 @@ main {
   transition: background 0.2s;
 }
 
-.add-item button:hover {
-  background: #d4602a;
-}
+.add-item button:hover { background: #d4602a; }
 
 .item-list {
   list-style: none;
@@ -192,13 +220,6 @@ main {
   background: #faf8f6;
   border-radius: 10px;
   font-size: 0.95rem;
-  transition: background 0.2s;
-}
-
-.item-list li.done {
-  text-decoration: line-through;
-  color: #aaa;
-  background: #f0ede9;
 }
 
 .item-list li input[type="checkbox"] {
@@ -209,9 +230,7 @@ main {
   flex-shrink: 0;
 }
 
-.item-list li .item-text {
-  flex: 1;
-}
+.item-list li .item-text { flex: 1; }
 
 .item-list li .btn-delete {
   background: none;
@@ -223,13 +242,153 @@ main {
   transition: color 0.2s;
 }
 
-.item-list li .btn-delete:hover {
-  color: #e74c3c;
-}
+.item-list li .btn-delete:hover { color: #e74c3c; }
 
 .empty-msg {
   text-align: center;
   color: #bbb;
   font-size: 0.85rem;
   padding: 10px 0;
+}
+
+/* ARCHIVES */
+.archive-header {
+  margin-bottom: 16px;
+}
+
+.archive-header h2 {
+  font-size: 1.2rem;
+  color: #2d2d2d;
+  margin-bottom: 4px;
+}
+
+/* STATS GLOBALES */
+.stats-global {
+  background: white;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  margin-bottom: 0;
+}
+
+.stats-global h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #aaa;
+  margin-bottom: 12px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-box {
+  flex: 1;
+  text-align: center;
+  padding: 12px 8px;
+  background: #f5f0eb;
+  border-radius: 12px;
+}
+
+.stat-box .stat-num {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #d4602a;
+  line-height: 1;
+}
+
+.stat-box .stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* YEAR SECTION */
+.year-section {
+  background: white;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.year-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.year-title h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2d2d2d;
+}
+
+.year-count {
+  background: #f5f0eb;
+  color: #d4602a;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.archive-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.archive-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: #faf8f6;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.archive-list li .check-icon {
+  color: #d4602a;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.archive-list li .item-date {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: #bbb;
+  white-space: nowrap;
+}
+
+.archive-list li .btn-unarchive {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0 2px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.archive-list li .btn-unarchive:hover { color: #d4602a; }
+
+.empty-archive {
+  text-align: center;
+  padding: 40px 20px;
+  color: #bbb;
+  font-size: 0.95rem;
+}
+
+.empty-archive p:first-child {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
 }

@@ -1,21 +1,33 @@
 const MAX_AMOUNT = 10000;
 
+// ─── Storage ───────────────────────────────────────────────────────────────
+
 function loadData() {
   return {
     amount: parseFloat(localStorage.getItem('japan_amount') || '0'),
-    books: JSON.parse(localStorage.getItem('books') || '[]'),
+    books:  JSON.parse(localStorage.getItem('books')  || '[]'),
     videos: JSON.parse(localStorage.getItem('videos') || '[]'),
     visits: JSON.parse(localStorage.getItem('visits') || '[]'),
   };
 }
 
-function saveAmount(amount) {
-  localStorage.setItem('japan_amount', amount);
+function saveAmount(v) { localStorage.setItem('japan_amount', v); }
+function saveList(key, list) { localStorage.setItem(key, JSON.stringify(list)); }
+
+// ─── Tabs ──────────────────────────────────────────────────────────────────
+
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelector(`.tab[onclick="showTab('${name}')"]`).classList.add('active');
+
+  if (name === 'livres')  renderArchive('books',  'archive-books',  '📚');
+  if (name === 'videos')  renderArchive('videos', 'archive-videos', '🎬');
+  if (name === 'visites') renderArchive('visits', 'archive-visits', '🏛️');
 }
 
-function saveList(key, list) {
-  localStorage.setItem(key, JSON.stringify(list));
-}
+// ─── Japan progress ────────────────────────────────────────────────────────
 
 function updateProgress(amount) {
   const pct = Math.min((amount / MAX_AMOUNT) * 100, 100);
@@ -41,9 +53,10 @@ function resetAmount() {
   updateProgress(0);
 }
 
+// ─── Todo lists ────────────────────────────────────────────────────────────
+
 function renderList(key, listId) {
-  const data = loadData();
-  const items = data[key];
+  const items = loadData()[key].filter(i => !i.done);
   const ul = document.getElementById(listId);
   ul.innerHTML = '';
 
@@ -52,14 +65,15 @@ function renderList(key, listId) {
     return;
   }
 
-  items.forEach((item, index) => {
+  const all = loadData()[key];
+  all.forEach((item, index) => {
+    if (item.done) return;
     const li = document.createElement('li');
-    if (item.done) li.classList.add('done');
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
-    checkbox.checked = item.done;
-    checkbox.addEventListener('change', () => toggleItem(key, index, listId));
+    checkbox.checked = false;
+    checkbox.addEventListener('change', () => completeItem(key, index, listId));
 
     const span = document.createElement('span');
     span.className = 'item-text';
@@ -81,17 +95,17 @@ function addItem(key, inputId, listId) {
   const input = document.getElementById(inputId);
   const text = input.value.trim();
   if (!text) return;
-
   const data = loadData();
-  data[key].push({ text, done: false });
+  data[key].push({ text, done: false, doneDate: null });
   saveList(key, data[key]);
   renderList(key, listId);
   input.value = '';
 }
 
-function toggleItem(key, index, listId) {
+function completeItem(key, index, listId) {
   const data = loadData();
-  data[key][index].done = !data[key][index].done;
+  data[key][index].done = true;
+  data[key][index].doneDate = new Date().toISOString();
   saveList(key, data[key]);
   renderList(key, listId);
 }
@@ -103,22 +117,128 @@ function deleteItem(key, index, listId) {
   renderList(key, listId);
 }
 
-// Allow pressing Enter to add items
-['book-input', 'video-input', 'visit-input', 'amount-input'].forEach(id => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener('keydown', e => {
-    if (e.key !== 'Enter') return;
-    if (id === 'amount-input') addAmount();
-    else if (id === 'book-input') addItem('books', 'book-input', 'book-list');
-    else if (id === 'video-input') addItem('videos', 'video-input', 'video-list');
-    else if (id === 'visit-input') addItem('visits', 'visit-input', 'visit-list');
+// ─── Archives ──────────────────────────────────────────────────────────────
+
+function renderArchive(key, containerId, emoji) {
+  const data = loadData();
+  const done = data[key]
+    .map((item, idx) => ({ ...item, _idx: idx }))
+    .filter(i => i.done);
+
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  if (done.length === 0) {
+    container.innerHTML = `
+      <div class="empty-archive">
+        <p>${emoji}</p>
+        <p>Rien dans les archives pour l'instant.<br>Cochez un élément depuis l'accueil pour le voir ici !</p>
+      </div>`;
+    return;
+  }
+
+  // Stats globales
+  const years = [...new Set(done.map(i => getYear(i.doneDate)))].sort((a, b) => b - a);
+  const statsEl = document.createElement('div');
+  statsEl.className = 'stats-global card';
+  statsEl.innerHTML = `
+    <h3>Statistiques globales</h3>
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-num">${done.length}</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">${years.length}</span>
+        <span class="stat-label">Années</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">${bestYear(done)}</span>
+        <span class="stat-label">Meilleure année</span>
+      </div>
+    </div>`;
+  container.appendChild(statsEl);
+
+  // Par année
+  years.forEach(year => {
+    const items = done.filter(i => getYear(i.doneDate) === year);
+    const section = document.createElement('div');
+    section.className = 'year-section card';
+
+    const titleRow = document.createElement('div');
+    titleRow.className = 'year-title';
+    titleRow.innerHTML = `<h3>${year}</h3><span class="year-count">${items.length} élément${items.length > 1 ? 's' : ''}</span>`;
+    section.appendChild(titleRow);
+
+    const ul = document.createElement('ul');
+    ul.className = 'archive-list';
+
+    items.forEach(item => {
+      const li = document.createElement('li');
+      const date = item.doneDate ? new Date(item.doneDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) : '';
+      li.innerHTML = `
+        <span class="check-icon">✓</span>
+        <span class="item-text">${item.text}</span>
+        <span class="item-date">${date}</span>`;
+
+      const unarchiveBtn = document.createElement('button');
+      unarchiveBtn.className = 'btn-unarchive';
+      unarchiveBtn.title = 'Remettre dans la liste';
+      unarchiveBtn.textContent = '↩';
+      unarchiveBtn.addEventListener('click', () => unarchiveItem(key, item._idx, containerId, emoji));
+      li.appendChild(unarchiveBtn);
+
+      ul.appendChild(li);
+    });
+
+    section.appendChild(ul);
+    container.appendChild(section);
+  });
+}
+
+function getYear(isoDate) {
+  if (!isoDate) return new Date().getFullYear();
+  return new Date(isoDate).getFullYear();
+}
+
+function bestYear(done) {
+  const counts = {};
+  done.forEach(i => {
+    const y = getYear(i.doneDate);
+    counts[y] = (counts[y] || 0) + 1;
+  });
+  return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+}
+
+function unarchiveItem(key, index, containerId, emoji) {
+  const data = loadData();
+  data[key][index].done = false;
+  data[key][index].doneDate = null;
+  saveList(key, data[key]);
+
+  const listMap = { books: 'book-list', videos: 'video-list', visits: 'visit-list' };
+  renderList(key, listMap[key]);
+  renderArchive(key, containerId, emoji);
+}
+
+// ─── Enter key support ─────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  const map = {
+    'amount-input': addAmount,
+    'book-input':   () => addItem('books',  'book-input',  'book-list'),
+    'video-input':  () => addItem('videos', 'video-input', 'video-list'),
+    'visit-input':  () => addItem('visits', 'visit-input', 'visit-list'),
+  };
+  Object.entries(map).forEach(([id, fn]) => {
+    document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') fn(); });
   });
 });
 
-// Init
-const data = loadData();
-updateProgress(data.amount);
-renderList('books', 'book-list');
+// ─── Init ──────────────────────────────────────────────────────────────────
+
+const _init = loadData();
+updateProgress(_init.amount);
+renderList('books',  'book-list');
 renderList('videos', 'video-list');
 renderList('visits', 'visit-list');
