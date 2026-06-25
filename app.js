@@ -96,7 +96,7 @@ function updateProgress(amount, animate) {
 
   const flag = document.getElementById('japan-flag');
   if (flag) {
-    const clamped = Math.min(pct, 96);
+    const clamped = 4 + (pct / 100) * 92;
     flag.style.left = clamped + '%';
   }
 
