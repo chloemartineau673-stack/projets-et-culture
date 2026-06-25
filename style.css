@@ -164,12 +164,31 @@ header h1 {
   position: absolute;
   top: 0;
   left: 4%;
-  font-size: 1.4rem;
-  line-height: 1;
   transform: translateX(-50%);
   transition: left 0.6s cubic-bezier(.4,0,.2,1);
   z-index: 2;
-  display: block;
+  width: 36px;
+  height: 28px;
+}
+
+.flag-svg {
+  width: 36px;
+  height: 28px;
+  overflow: visible;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.2));
+}
+
+.flag-wave {
+  transform-origin: 3px 12px;
+  animation: flag-wave 1.8s ease-in-out infinite;
+}
+
+@keyframes flag-wave {
+  0%   { transform: skewY(0deg) scaleX(1); }
+  25%  { transform: skewY(3deg) scaleX(0.97); }
+  50%  { transform: skewY(0deg) scaleX(1); }
+  75%  { transform: skewY(-3deg) scaleX(0.97); }
+  100% { transform: skewY(0deg) scaleX(1); }
 }
 
 .progress-bar-bg {

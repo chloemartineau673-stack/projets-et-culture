@@ -27,7 +27,17 @@
         <span>/ 10 000 €</span>
       </div>
       <div class="japan-bar-wrap">
-        <span class="japan-flag" id="japan-flag">🇯🇵</span>
+        <div class="japan-flag" id="japan-flag">
+          <svg class="flag-svg" viewBox="0 0 36 28" xmlns="http://www.w3.org/2000/svg">
+            <!-- Mât -->
+            <line x1="2" y1="2" x2="2" y2="28" stroke="#888" stroke-width="2" stroke-linecap="round"/>
+            <!-- Drapeau blanc avec animation flottement -->
+            <g class="flag-wave">
+              <rect x="3" y="2" width="33" height="20" rx="1.5" fill="white" stroke="#ddd" stroke-width="0.5"/>
+              <circle cx="19.5" cy="12" r="6" fill="#bc002d"/>
+            </g>
+          </svg>
+        </div>
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" id="progress-fill"></div>
         </div>
