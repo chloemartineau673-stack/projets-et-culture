@@ -127,36 +127,50 @@ header h1 {
   color: var(--text);
 }
 
-/* ── Japan card ──────────────────────────────────────────────── */
-.japan-card {
-  background: linear-gradient(135deg, #fff5f5, #fde0e0);
-  border: 1px solid #f5c0c0;
+/* ── Japan section ───────────────────────────────────────────── */
+.japan-section {
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(124,92,191,0.1);
+  border: 1px solid rgba(255,255,255,0.7);
 }
 
-.progress-info {
+.japan-title {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
 }
 
-.progress-info span:first-child {
-  font-size: 1.4rem;
+.japan-amounts {
+  font-size: 0.95rem;
   font-weight: 700;
   color: #c0393b;
 }
 
-.progress-info span:last-child {
-  font-size: 0.9rem;
-  color: #888;
+.japan-max {
+  font-size: 0.8rem;
+  color: #aaa;
+  font-weight: 400;
+}
+
+.japan-bar-wrap {
+  position: relative;
+  margin-bottom: 6px;
+  padding-bottom: 22px;
 }
 
 .progress-bar-bg {
-  background: #f5d5d5;
+  background: #f0ebfa;
   border-radius: 50px;
-  height: 18px;
-  overflow: hidden;
-  margin-bottom: 6px;
+  height: 14px;
+  overflow: visible;
+  position: relative;
 }
 
 .progress-bar-fill {
@@ -164,12 +178,23 @@ header h1 {
   border-radius: 50px;
   background: linear-gradient(90deg, #e07878, #c0393b);
   width: 0%;
-  transition: width 0.5s ease;
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+.japan-flag {
+  position: absolute;
+  bottom: 0;
+  font-size: 1.6rem;
+  left: 0%;
+  transform: translateX(-50%);
+  transition: left 0.6s cubic-bezier(.4,0,.2,1);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  line-height: 1;
 }
 
 .progress-percent {
   text-align: right;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #c0393b;
   font-weight: 600;
   margin-bottom: 14px;
@@ -185,7 +210,7 @@ header h1 {
   flex: 1;
   min-width: 120px;
   padding: 10px 14px;
-  border: 1.5px solid #f5c0c0;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
   font-size: 0.95rem;
   background: white;
@@ -206,6 +231,28 @@ header h1 {
 .add-amount button:hover { background: #a02e30; }
 .btn-reset { background: #aaa !important; }
 .btn-reset:hover { background: #888 !important; }
+
+/* ── Feux d'artifice ─────────────────────────────────────────── */
+#fireworks-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.firework {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: firework-burst 1s ease-out forwards;
+}
+
+@keyframes firework-burst {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
 
 /* ── Lists ───────────────────────────────────────────────────── */
 .add-item {

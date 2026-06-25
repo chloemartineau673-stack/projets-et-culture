@@ -88,11 +88,49 @@ function showTab(name) {
 
 // ─── Japan progress ────────────────────────────────────────────────────────
 
-function updateProgress(amount) {
+function updateProgress(amount, animate) {
   const pct = Math.min((amount / MAX_AMOUNT) * 100, 100);
   document.getElementById('progress-fill').style.width = pct + '%';
   document.getElementById('progress-percent').textContent = pct.toFixed(1) + '%';
   document.getElementById('amount-display').textContent = amount.toLocaleString('fr-FR') + ' €';
+
+  const flag = document.getElementById('japan-flag');
+  if (flag) flag.style.left = pct + '%';
+
+  if (animate && pct >= 100) launchFireworks();
+}
+
+function launchFireworks() {
+  const colors = ['#ff4444','#ff9900','#ffee00','#44ff44','#44aaff','#cc44ff','#ff44cc'];
+  const container = document.getElementById('fireworks-container');
+  let count = 0;
+
+  function burst() {
+    if (count > 8) return;
+    count++;
+    const cx = 20 + Math.random() * 60;
+    const cy = 10 + Math.random() * 50;
+
+    for (let i = 0; i < 24; i++) {
+      const el = document.createElement('div');
+      el.className = 'firework';
+      const angle = (i / 24) * 2 * Math.PI;
+      const dist = 60 + Math.random() * 80;
+      el.style.cssText = `
+        left:${cx}%;top:${cy}%;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        --dx:${Math.cos(angle)*dist}px;
+        --dy:${Math.sin(angle)*dist}px;
+        animation-duration:${0.8+Math.random()*0.5}s;
+      `;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 1400);
+    }
+    setTimeout(burst, 400);
+  }
+
+  burst();
+  setTimeout(() => container.innerHTML = '', 5000);
 }
 
 function addAmount() {
@@ -102,7 +140,7 @@ function addAmount() {
   const data = loadData();
   const newAmount = Math.min(data.amount + val, MAX_AMOUNT);
   saveAmount(newAmount);
-  updateProgress(newAmount);
+  updateProgress(newAmount, true);
   input.value = '';
 }
 
