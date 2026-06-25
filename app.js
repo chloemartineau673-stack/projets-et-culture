@@ -1,5 +1,64 @@
 const MAX_AMOUNT = 10000;
 
+// ─── Fond décoratif ────────────────────────────────────────────────────────
+
+const BG_ICONS = [
+  // Livre ouvert
+  `<svg viewBox="0 0 24 24" fill="none" stroke="#7c5cbf" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+  </svg>`,
+  // Avion
+  `<svg viewBox="0 0 24 24" fill="none" stroke="#7c5cbf" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
+  </svg>`,
+  // Clap cinéma
+  `<svg viewBox="0 0 24 24" fill="none" stroke="#7c5cbf" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.2 6L3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1-.3 2.1.3 2.4 1.3z"/>
+    <rect x="2" y="11" width="20" height="11" rx="2"/>
+    <line x1="7" y1="11" x2="7" y2="22"/>
+    <line x1="12" y1="11" x2="12" y2="22"/>
+    <line x1="17" y1="11" x2="17" y2="22"/>
+    <line x1="2" y1="16.5" x2="22" y2="16.5"/>
+  </svg>`,
+  // Globe
+  `<svg viewBox="0 0 24 24" fill="none" stroke="#7c5cbf" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="2" y1="12" x2="22" y2="12"/>
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  </svg>`,
+  // Appareil photo
+  `<svg viewBox="0 0 24 24" fill="none" stroke="#7c5cbf" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+    <circle cx="12" cy="13" r="4"/>
+  </svg>`,
+  // Étoile / favoris
+  `<svg viewBox="0 0 24 24" fill="none" stroke="#7c5cbf" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+  </svg>`,
+];
+
+function renderBgIcons() {
+  const container = document.getElementById('bg-icons');
+  if (!container) return;
+  const cols = Math.ceil(window.innerWidth / 90) + 1;
+  const rows = Math.ceil(window.innerHeight / 90) + 1;
+  let html = '';
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const icon = BG_ICONS[(r * cols + c) % BG_ICONS.length];
+      const x = c * 90 + (r % 2 === 0 ? 0 : 45);
+      const y = r * 90;
+      const rot = ((r * 7 + c * 13) % 40) - 20;
+      html += `<div style="position:absolute;left:${x}px;top:${y}px;width:40px;height:40px;opacity:0.09;transform:rotate(${rot}deg)">${icon}</div>`;
+    }
+  }
+  container.innerHTML = html;
+}
+
+renderBgIcons();
+window.addEventListener('resize', renderBgIcons);
+
 // ─── Storage ───────────────────────────────────────────────────────────────
 
 function loadData() {
