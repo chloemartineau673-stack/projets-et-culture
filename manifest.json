@@ -1,7 +1,7 @@
 {
   "name": "Projets & Culture",
   "short_name": "Projets",
-  "start_url": "/",
+  "start_url": "/projets-et-culture/",
   "display": "standalone",
   "background_color": "#f5f0eb",
   "theme_color": "#2d2d2d",
