@@ -1,0 +1,235 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f5f0eb;
+  color: #2d2d2d;
+  min-height: 100vh;
+}
+
+header {
+  background: #2d2d2d;
+  color: white;
+  text-align: center;
+  padding: 20px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+header h1 {
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+}
+
+main {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 14px;
+  color: #2d2d2d;
+}
+
+/* Japan card */
+.japan-card {
+  background: linear-gradient(135deg, #fff7f0, #ffe8d6);
+  border: 1px solid #f4c9a4;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.progress-info span:first-child {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #d4602a;
+}
+
+.progress-info span:last-child {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.progress-bar-bg {
+  background: #f0ddd0;
+  border-radius: 50px;
+  height: 18px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 50px;
+  background: linear-gradient(90deg, #f4813f, #d4602a);
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.progress-percent {
+  text-align: right;
+  font-size: 0.85rem;
+  color: #d4602a;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.add-amount {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.add-amount input {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 14px;
+  border: 1.5px solid #f4c9a4;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: white;
+}
+
+.add-amount button {
+  padding: 10px 16px;
+  background: #d4602a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-amount button:hover {
+  background: #b84f22;
+}
+
+.btn-reset {
+  background: #aaa !important;
+}
+
+.btn-reset:hover {
+  background: #888 !important;
+}
+
+/* Lists */
+.add-item {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.add-item input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid #e0d8d0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: #faf8f6;
+}
+
+.add-item input:focus {
+  outline: none;
+  border-color: #d4602a;
+}
+
+.add-item button {
+  width: 40px;
+  height: 40px;
+  background: #2d2d2d;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.add-item button:hover {
+  background: #d4602a;
+}
+
+.item-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #faf8f6;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+
+.item-list li.done {
+  text-decoration: line-through;
+  color: #aaa;
+  background: #f0ede9;
+}
+
+.item-list li input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #d4602a;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.item-list li .item-text {
+  flex: 1;
+}
+
+.item-list li .btn-delete {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.item-list li .btn-delete:hover {
+  color: #e74c3c;
+}
+
+.empty-msg {
+  text-align: center;
+  color: #bbb;
+  font-size: 0.85rem;
+  padding: 10px 0;
+}
