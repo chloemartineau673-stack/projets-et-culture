@@ -304,7 +304,8 @@ function bestYear(done) {
   return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
 }
 
-function addToArchive(key, inputId, yearId, containerId, emoji) {
+function addToArchive(key, inputId, yearId, containerId) {
+  const emojiMap = { books: '📚', videos: '🎬', visits: '🏛️' };
   const text = document.getElementById(inputId).value.trim();
   const year = parseInt(document.getElementById(yearId).value);
   if (!text) return;
@@ -313,7 +314,7 @@ function addToArchive(key, inputId, yearId, containerId, emoji) {
   const data = loadData();
   data[key].push({ text, done: true, doneDate: date });
   saveList(key, data[key]);
-  renderArchive(key, containerId, emoji);
+  renderArchive(key, containerId, emojiMap[key]);
   document.getElementById(inputId).value = '';
 }
 
