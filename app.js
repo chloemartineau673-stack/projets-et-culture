@@ -95,42 +95,39 @@ function updateProgress(amount, animate) {
   document.getElementById('amount-display').textContent = amount.toLocaleString('fr-FR') + ' €';
 
   const flag = document.getElementById('japan-flag');
-  if (flag) flag.style.left = pct + '%';
+  if (flag) {
+    const clamped = Math.min(pct, 96);
+    flag.style.left = clamped + '%';
+  }
 
   if (animate && pct >= 100) launchFireworks();
 }
 
 function launchFireworks() {
-  const colors = ['#ff4444','#ff9900','#ffee00','#44ff44','#44aaff','#cc44ff','#ff44cc'];
+  const colors = ['#ff4444','#ff9900','#ffee00','#7c5cbf','#44aaff','#cc44ff','#ff44cc','#fff'];
   const container = document.getElementById('fireworks-container');
   let count = 0;
 
   function burst() {
-    if (count > 8) return;
+    if (count >= 10) return;
     count++;
-    const cx = 20 + Math.random() * 60;
-    const cy = 10 + Math.random() * 50;
-
-    for (let i = 0; i < 24; i++) {
+    const cx = 15 + Math.random() * 70;
+    const cy = 10 + Math.random() * 60;
+    for (let i = 0; i < 20; i++) {
       const el = document.createElement('div');
       el.className = 'firework';
-      const angle = (i / 24) * 2 * Math.PI;
-      const dist = 60 + Math.random() * 80;
-      el.style.cssText = `
-        left:${cx}%;top:${cy}%;
-        background:${colors[Math.floor(Math.random()*colors.length)]};
-        --dx:${Math.cos(angle)*dist}px;
-        --dy:${Math.sin(angle)*dist}px;
-        animation-duration:${0.8+Math.random()*0.5}s;
-      `;
+      const angle = (i / 20) * 2 * Math.PI;
+      const dist = 50 + Math.random() * 90;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      el.style.cssText = `left:${cx}%;top:${cy}%;background:${color};--dx:${Math.cos(angle)*dist}px;--dy:${Math.sin(angle)*dist}px;animation-duration:${0.7+Math.random()*0.6}s;`;
       container.appendChild(el);
-      setTimeout(() => el.remove(), 1400);
+      setTimeout(() => el.remove(), 1500);
     }
-    setTimeout(burst, 400);
+    setTimeout(burst, 350);
   }
 
   burst();
-  setTimeout(() => container.innerHTML = '', 5000);
+  setTimeout(() => { container.innerHTML = ''; }, 5000);
 }
 
 function addAmount() {
