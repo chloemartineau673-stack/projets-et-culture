@@ -129,8 +129,9 @@ header h1 {
 
 /* ── Japan card ──────────────────────────────────────────────── */
 .japan-card {
-  background: linear-gradient(135deg, #fff5f5, #fde0e0);
-  border: 1px solid #f5c0c0;
+  background: linear-gradient(135deg, #fff5f5, #fde0e0) !important;
+  border: 1px solid #f5c0c0 !important;
+  backdrop-filter: none !important;
 }
 
 .progress-info {
