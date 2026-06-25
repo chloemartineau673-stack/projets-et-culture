@@ -304,6 +304,19 @@ function bestYear(done) {
   return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
 }
 
+function addToArchive(key, inputId, yearId, containerId, emoji) {
+  const text = document.getElementById(inputId).value.trim();
+  const year = parseInt(document.getElementById(yearId).value);
+  if (!text) return;
+
+  const date = new Date(year, 5, 15).toISOString();
+  const data = loadData();
+  data[key].push({ text, done: true, doneDate: date });
+  saveList(key, data[key]);
+  renderArchive(key, containerId, emoji);
+  document.getElementById(inputId).value = '';
+}
+
 function unarchiveItem(key, index, containerId, emoji) {
   const data = loadData();
   data[key][index].done = false;

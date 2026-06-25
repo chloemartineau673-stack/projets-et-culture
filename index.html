@@ -83,16 +83,52 @@
 
   <!-- ARCHIVES LIVRES -->
   <main id="tab-livres" class="tab-content">
+    <section class="card add-archive-card">
+      <h2>📚 Ajouter un livre lu</h2>
+      <div class="add-archive-form">
+        <input type="text" id="archive-book-input" placeholder="Titre du livre..." />
+        <select id="archive-book-year">
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+        </select>
+        <button onclick="addToArchive('books', 'archive-book-input', 'archive-book-year', 'archive-books', '📚')">+</button>
+      </div>
+    </section>
     <div id="archive-books"></div>
   </main>
 
   <!-- ARCHIVES VIDÉOS -->
   <main id="tab-videos" class="tab-content">
+    <section class="card add-archive-card">
+      <h2>🎬 Ajouter une vidéo vue</h2>
+      <div class="add-archive-form">
+        <input type="text" id="archive-video-input" placeholder="Titre de la vidéo..." />
+        <select id="archive-video-year">
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+        </select>
+        <button onclick="addToArchive('videos', 'archive-video-input', 'archive-video-year', 'archive-videos', '🎬')">+</button>
+      </div>
+    </section>
     <div id="archive-videos"></div>
   </main>
 
   <!-- ARCHIVES VISITES -->
   <main id="tab-visites" class="tab-content">
+    <section class="card add-archive-card">
+      <h2>🏛️ Ajouter une visite faite</h2>
+      <div class="add-archive-form">
+        <input type="text" id="archive-visit-input" placeholder="Nom de la visite..." />
+        <select id="archive-visit-year">
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+        </select>
+        <button onclick="addToArchive('visits', 'archive-visit-input', 'archive-visit-year', 'archive-visits', '🏛️')">+</button>
+      </div>
+    </section>
     <div id="archive-visits"></div>
   </main>
 

@@ -352,6 +352,55 @@ header h1 {
   padding: 10px 0;
 }
 
+/* ── Ajout direct archives ───────────────────────────────────── */
+.add-archive-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.add-archive-form input {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: var(--item-bg);
+}
+
+.add-archive-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.add-archive-form select {
+  padding: 10px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  background: var(--item-bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.add-archive-form button {
+  width: 40px;
+  height: 40px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.add-archive-form button:hover { background: var(--accent-dark); }
+
 /* ── Archives ────────────────────────────────────────────────── */
 .stats-global {
   background: var(--card-bg);
