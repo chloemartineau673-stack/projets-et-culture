@@ -15,7 +15,7 @@ header {
   background: #2d2d2d;
   color: white;
   text-align: center;
-  padding: 16px 16px 0;
+  padding: 16px;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -25,43 +25,60 @@ header {
 header h1 {
   font-size: 1.3rem;
   letter-spacing: 1px;
-  margin-bottom: 12px;
 }
 
-/* TABS NAV */
-.tabs {
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  background: white;
+  border-top: 1px solid #e8e2db;
   display: flex;
-  gap: 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  align-items: stretch;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+  z-index: 100;
 }
 
-.tabs::-webkit-scrollbar { display: none; }
-
-.tab {
+.nav-btn {
   flex: 1;
-  min-width: 80px;
-  padding: 10px 8px;
-  background: transparent;
-  color: #aaa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: none;
   border: none;
-  border-bottom: 3px solid transparent;
-  font-size: 0.82rem;
+  color: #bbb;
+  font-size: 0.7rem;
   font-weight: 600;
   cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.2s, border-color 0.2s;
+  transition: color 0.2s;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-.tab.active {
-  color: white;
-  border-bottom: 3px solid #d4602a;
+.nav-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  transition: stroke 0.2s;
+}
+
+.nav-btn.active {
+  color: #d4602a;
+}
+
+.nav-btn.active svg {
+  stroke: #d4602a;
 }
 
 /* TAB CONTENT */
 .tab-content {
   display: none;
   padding: 16px;
+  padding-bottom: 84px;
   flex-direction: column;
   gap: 16px;
   max-width: 600px;

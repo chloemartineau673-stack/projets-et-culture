@@ -18,9 +18,9 @@ function saveList(key, list) { localStorage.setItem(key, JSON.stringify(list)); 
 
 function showTab(name) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  document.querySelector(`.tab[onclick="showTab('${name}')"]`).classList.add('active');
+  document.querySelector(`.nav-btn[onclick="showTab('${name}')"]`).classList.add('active');
 
   if (name === 'livres')  renderArchive('books',  'archive-books',  '📚');
   if (name === 'videos')  renderArchive('videos', 'archive-videos', '🎬');
