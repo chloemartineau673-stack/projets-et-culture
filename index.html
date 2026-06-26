@@ -11,7 +11,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Projets & Culture</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=13" />
+  <link rel="stylesheet" href="style.css?v=14" />
 </head>
 <body>
   <div id="bg-icons"></div>
@@ -23,64 +23,76 @@
   <!-- ACCUEIL -->
   <main id="tab-accueil" class="tab-content active">
 
-    <section class="card japan-card">
-      <h2>✈️ Voyage au Japon</h2>
-      <div class="progress-info">
-        <span id="amount-display">0 €</span>
-        <span>/ 10 000 €</span>
-      </div>
-      <div class="japan-bar-wrap">
-        <div class="japan-flag" id="japan-flag">
-          <svg class="flag-svg" viewBox="0 0 36 28" xmlns="http://www.w3.org/2000/svg">
-            <!-- Mât -->
-            <line x1="2" y1="2" x2="2" y2="28" stroke="#888" stroke-width="2" stroke-linecap="round"/>
-            <!-- Drapeau blanc avec animation flottement -->
-            <g class="flag-wave">
-              <rect x="3" y="2" width="33" height="20" rx="1.5" fill="white" stroke="#ddd" stroke-width="0.5"/>
-              <circle cx="19.5" cy="12" r="6" fill="#bc002d"/>
-            </g>
-          </svg>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" id="progress-fill"></div>
-        </div>
-      </div>
-      <p class="progress-percent" id="progress-percent">0%</p>
-      <div class="add-amount">
-        <input type="number" id="amount-input" placeholder="Montant en €" min="0" />
-        <button onclick="addAmount()">Ajouter</button>
-        <button class="btn-reset" onclick="resetAmount()">Réinitialiser</button>
-      </div>
-    </section>
-
     <div id="fireworks-container"></div>
 
-    <section class="card">
-      <h2>📚 Livres à lire</h2>
-      <div class="add-item">
-        <input type="text" id="book-input" placeholder="Ajouter un livre..." />
-        <button onclick="addItem('books', 'book-input', 'book-list')">+</button>
-      </div>
-      <ul id="book-list" class="item-list"></ul>
-    </section>
+    <div class="home-grid">
 
-    <section class="card">
-      <h2>🎬 Vidéos à regarder</h2>
-      <div class="add-item">
-        <input type="text" id="video-input" placeholder="Ajouter une vidéo..." />
-        <button onclick="addItem('videos', 'video-input', 'video-list')">+</button>
-      </div>
-      <ul id="video-list" class="item-list"></ul>
-    </section>
+      <!-- Colonne gauche : Japon + Visites -->
+      <div class="home-col">
 
-    <section class="card">
-      <h2>🏛️ Visites culturelles</h2>
-      <div class="add-item">
-        <input type="text" id="visit-input" placeholder="Ajouter une visite..." />
-        <button onclick="addItem('visits', 'visit-input', 'visit-list')">+</button>
+        <section class="card japan-card">
+          <h2>✈️ Voyage au Japon</h2>
+          <div class="progress-info">
+            <span id="amount-display">0 €</span>
+            <span>/ 10 000 €</span>
+          </div>
+          <div class="japan-bar-wrap">
+            <div class="japan-flag" id="japan-flag">
+              <svg class="flag-svg" viewBox="0 0 36 28" xmlns="http://www.w3.org/2000/svg">
+                <line x1="2" y1="2" x2="2" y2="28" stroke="#888" stroke-width="2" stroke-linecap="round"/>
+                <g class="flag-wave">
+                  <rect x="3" y="2" width="33" height="20" rx="1.5" fill="white" stroke="#ddd" stroke-width="0.5"/>
+                  <circle cx="19.5" cy="12" r="6" fill="#bc002d"/>
+                </g>
+              </svg>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+          </div>
+          <p class="progress-percent" id="progress-percent">0%</p>
+          <div class="add-amount">
+            <input type="number" id="amount-input" placeholder="Montant en €" min="0" />
+            <button onclick="addAmount()">Ajouter</button>
+            <button class="btn-reset" onclick="resetAmount()">Réinitialiser</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>🏛️ Visites culturelles</h2>
+          <div class="add-item">
+            <input type="text" id="visit-input" placeholder="Ajouter une visite..." />
+            <button onclick="addItem('visits', 'visit-input', 'visit-list')">+</button>
+          </div>
+          <ul id="visit-list" class="item-list"></ul>
+        </section>
+
       </div>
-      <ul id="visit-list" class="item-list"></ul>
-    </section>
+
+      <!-- Colonne droite : Livres + Vidéos -->
+      <div class="home-col">
+
+        <section class="card">
+          <h2>📚 Livres à lire</h2>
+          <div class="add-item">
+            <input type="text" id="book-input" placeholder="Ajouter un livre..." />
+            <button onclick="addItem('books', 'book-input', 'book-list')">+</button>
+          </div>
+          <ul id="book-list" class="item-list"></ul>
+        </section>
+
+        <section class="card">
+          <h2>🎬 Vidéos à regarder</h2>
+          <div class="add-item">
+            <input type="text" id="video-input" placeholder="Ajouter une vidéo..." />
+            <button onclick="addItem('videos', 'video-input', 'video-list')">+</button>
+          </div>
+          <ul id="video-list" class="item-list"></ul>
+        </section>
+
+      </div>
+
+    </div>
 
   </main>
 

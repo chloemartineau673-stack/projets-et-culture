@@ -111,6 +111,26 @@ header h1 {
 
 .tab-content.active { display: flex; }
 
+/* ── Grille accueil ─────────────────────────────────────────── */
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.home-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 500px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Cards ───────────────────────────────────────────────────── */
 .card {
   background: var(--card-bg);
