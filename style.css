@@ -524,29 +524,39 @@ header h1 {
 
 .archive-list li .btn-unarchive {
   background: none;
-  border: none;
-  color: #ccc;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
   font-size: 0.85rem;
   cursor: pointer;
-  padding: 0 2px;
-  transition: color 0.2s;
+  padding: 4px 7px;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
   flex-shrink: 0;
+  line-height: 1;
 }
 
-.archive-list li .btn-unarchive:hover { color: var(--accent); }
+.archive-list li .btn-unarchive:hover {
+  background: var(--accent);
+  color: white;
+}
 
 .archive-list li .btn-archive-delete {
   background: none;
-  border: none;
-  color: #ccc;
-  font-size: 0.9rem;
+  border: 1.5px solid #e74c3c;
+  color: #e74c3c;
+  font-size: 0.8rem;
   cursor: pointer;
-  padding: 0 2px;
-  transition: color 0.2s;
+  padding: 4px 7px;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
   flex-shrink: 0;
+  line-height: 1;
 }
 
-.archive-list li .btn-archive-delete:hover { color: #e74c3c; }
+.archive-list li .btn-archive-delete:hover {
+  background: #e74c3c;
+  color: white;
+}
 
 .empty-archive {
   text-align: center;
