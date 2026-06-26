@@ -355,10 +355,17 @@ function renderArchive(key, containerId, emoji) {
 
       const unarchiveBtn = document.createElement('button');
       unarchiveBtn.className = 'btn-unarchive';
-      unarchiveBtn.title = 'Remettre dans la liste';
+      unarchiveBtn.title = 'Remettre dans la liste à faire';
       unarchiveBtn.textContent = '↩';
       unarchiveBtn.addEventListener('click', () => unarchiveItem(key, item._idx, containerId, emoji));
       li.appendChild(unarchiveBtn);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn-archive-delete';
+      delBtn.title = 'Supprimer définitivement';
+      delBtn.textContent = '✕';
+      delBtn.addEventListener('click', () => deleteArchiveItem(key, item._idx, containerId, emoji));
+      li.appendChild(delBtn);
 
       ul.appendChild(li);
     });
@@ -404,6 +411,14 @@ function unarchiveItem(key, index, containerId, emoji) {
 
   const listMap = { books: 'book-list', videos: 'video-list', visits: 'visit-list' };
   renderList(key, listMap[key]);
+  renderArchive(key, containerId, emoji);
+}
+
+function deleteArchiveItem(key, index, containerId, emoji) {
+  if (!confirm('Supprimer définitivement cet élément des archives ?')) return;
+  const data = loadData();
+  data[key].splice(index, 1);
+  saveList(key, data[key]);
   renderArchive(key, containerId, emoji);
 }
 
