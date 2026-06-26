@@ -1,5 +1,68 @@
 const MAX_AMOUNT = 10000;
 
+// ─── Synchronisation Firebase (cloud) ──────────────────────────────────────
+
+const firebaseConfig = {
+  apiKey: "AIzaSyApYKhmNabzlMBlEDWPxHuOiamMUFG5kWg",
+  authDomain: "projets-et-culture.firebaseapp.com",
+  projectId: "projets-et-culture",
+  storageBucket: "projets-et-culture.firebasestorage.app",
+  messagingSenderId: "685330973278",
+  appId: "1:685330973278:web:d9577079e887a4af432acf",
+};
+
+let cloudDoc = null;
+let applyingCloud = false;
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  cloudDoc = firebase.firestore().collection('app').doc('shared');
+} catch (e) {
+  console.error('Firebase init', e);
+}
+
+function pushToCloud() {
+  if (!cloudDoc || applyingCloud) return;
+  cloudDoc.set({
+    amount: parseFloat(localStorage.getItem('japan_amount') || '0'),
+    books:  JSON.parse(localStorage.getItem('books')  || '[]'),
+    videos: JSON.parse(localStorage.getItem('videos') || '[]'),
+    visits: JSON.parse(localStorage.getItem('visits') || '[]'),
+    updated: Date.now(),
+  }).catch(e => console.error('Cloud push', e));
+}
+
+function startCloudSync() {
+  if (!cloudDoc) return;
+  cloudDoc.onSnapshot(snap => {
+    if (!snap.exists) { pushToCloud(); return; }
+    const d = snap.data();
+    applyingCloud = true;
+    localStorage.setItem('japan_amount', d.amount ?? 0);
+    localStorage.setItem('books',  JSON.stringify(d.books  || []));
+    localStorage.setItem('videos', JSON.stringify(d.videos || []));
+    localStorage.setItem('visits', JSON.stringify(d.visits || []));
+    applyingCloud = false;
+    renderAll();
+  }, err => console.error('Cloud listen', err));
+}
+
+function renderAll() {
+  updateProgress(loadData().amount);
+  renderList('books',  'book-list');
+  renderList('videos', 'video-list');
+  renderList('visits', 'visit-list');
+  const archives = {
+    livres:  ['books',  'archive-books',  '📚'],
+    videos:  ['videos', 'archive-videos', '🎬'],
+    visites: ['visits', 'archive-visits', '🏛️'],
+  };
+  Object.entries(archives).forEach(([tab, [key, cont, emo]]) => {
+    const el = document.getElementById('tab-' + tab);
+    if (el && el.classList.contains('active')) renderArchive(key, cont, emo);
+  });
+}
+
 // ─── Fond décoratif ────────────────────────────────────────────────────────
 
 const BG_ICONS = [
@@ -70,8 +133,8 @@ function loadData() {
   };
 }
 
-function saveAmount(v) { localStorage.setItem('japan_amount', v); }
-function saveList(key, list) { localStorage.setItem(key, JSON.stringify(list)); }
+function saveAmount(v) { localStorage.setItem('japan_amount', v); pushToCloud(); }
+function saveList(key, list) { localStorage.setItem(key, JSON.stringify(list)); pushToCloud(); }
 
 // ─── Tabs ──────────────────────────────────────────────────────────────────
 
@@ -350,3 +413,5 @@ updateProgress(_init.amount);
 renderList('books',  'book-list');
 renderList('videos', 'video-list');
 renderList('visits', 'visit-list');
+
+startCloudSync();
