@@ -210,6 +210,21 @@ function resetAmount() {
   updateProgress(0);
 }
 
+// ─── Liens cliquables ──────────────────────────────────────────────────────
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Renvoie le HTML du texte avec les URLs transformées en liens cliquables
+function linkifyHtml(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return escapeHtml(text).replace(urlRegex, url =>
+    `<a href="${url}" target="_blank" rel="noopener" class="item-link">${url}</a>`
+  );
+}
+
 // ─── Todo lists ────────────────────────────────────────────────────────────
 
 function renderList(key, listId) {
@@ -234,7 +249,7 @@ function renderList(key, listId) {
 
     const span = document.createElement('span');
     span.className = 'item-text';
-    span.textContent = item.text;
+    span.innerHTML = linkifyHtml(item.text);
 
     const del = document.createElement('button');
     del.className = 'btn-delete';
@@ -335,7 +350,7 @@ function renderArchive(key, containerId, emoji) {
       const date = item.doneDate ? new Date(item.doneDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) : '';
       li.innerHTML = `
         <span class="check-icon">✓</span>
-        <span class="item-text">${item.text}</span>
+        <span class="item-text">${linkifyHtml(item.text)}</span>
         <span class="item-date">${date}</span>`;
 
       const unarchiveBtn = document.createElement('button');

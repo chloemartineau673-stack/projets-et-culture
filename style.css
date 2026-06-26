@@ -331,7 +331,13 @@ header h1 {
   flex-shrink: 0;
 }
 
-.item-list li .item-text { flex: 1; }
+.item-list li .item-text { flex: 1; word-break: break-word; }
+
+.item-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+}
 
 .item-list li .btn-delete {
   background: none;
