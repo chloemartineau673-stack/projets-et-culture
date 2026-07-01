@@ -11,7 +11,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Projets & Culture</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=16" />
+  <link rel="stylesheet" href="style.css?v=17" />
 </head>
 <body>
   <div id="bg-icons"></div>
@@ -58,15 +58,6 @@
           </div>
         </section>
 
-        <section class="card">
-          <h2>🏛️ Visites culturelles</h2>
-          <div class="add-item">
-            <input type="text" id="visit-input" placeholder="Ajouter une visite..." />
-            <button onclick="addItem('visits', 'visit-input', 'visit-list')">+</button>
-          </div>
-          <ul id="visit-list" class="item-list"></ul>
-        </section>
-
       </div>
 
       <!-- Colonne droite : Livres + Vidéos + Films -->
@@ -102,6 +93,16 @@
       </div>
 
     </div>
+
+    <!-- Visites pleine largeur en bas -->
+    <section class="card home-visits-card">
+      <h2>🏛️ Visites à faire</h2>
+      <div class="add-item">
+        <input type="text" id="visit-input" placeholder="Ajouter une visite..." />
+        <button onclick="addItem('visits', 'visit-input', 'visit-list')">+</button>
+      </div>
+      <ul id="visit-list" class="item-list visits-inline"></ul>
+    </section>
 
   </main>
 
@@ -159,22 +160,109 @@
     <div id="archive-films"></div>
   </main>
 
-  <!-- ARCHIVES VISITES -->
-  <main id="tab-visites" class="tab-content">
-    <section class="card add-archive-card">
-      <h2>🏛️ Ajouter une visite faite</h2>
-      <div class="add-archive-form">
-        <input type="text" id="archive-visit-input" placeholder="Nom de la visite..." />
-        <select id="archive-visit-year">
-          <option value="2026">2026</option>
-          <option value="2025">2025</option>
-          <option value="2024">2024</option>
-          <option value="2023">2023</option>
-        </select>
-        <button onclick="addToArchive('visits', 'archive-visit-input', 'archive-visit-year', 'archive-visits')">+</button>
+  <!-- VISITES : sous-onglets -->
+  <main id="tab-visites" class="tab-content visites-main">
+
+    <nav class="sub-tabs">
+      <button class="sub-tab active" onclick="showSubTab('voyages')">✈️ Voyages</button>
+      <button class="sub-tab" onclick="showSubTab('sorties')">🎭 Sorties</button>
+      <button class="sub-tab" onclick="showSubTab('carte')">🗺️ Carte</button>
+    </nav>
+
+    <!-- VOYAGES -->
+    <div id="subtab-voyages" class="sub-content active">
+      <section class="card add-archive-card">
+        <h2>✈️ Ajouter un voyage</h2>
+        <div class="add-archive-form">
+          <input type="text" id="archive-voyage-input" placeholder="Destination..." />
+          <select id="archive-voyage-year">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+          </select>
+          <button onclick="addToArchive('voyages', 'archive-voyage-input', 'archive-voyage-year', 'archive-voyages')">+</button>
+        </div>
+      </section>
+      <div id="archive-voyages"></div>
+    </div>
+
+    <!-- SORTIES & ACTIVITÉS -->
+    <div id="subtab-sorties" class="sub-content">
+      <section class="card add-archive-card">
+        <h2>🎭 Ajouter une sortie</h2>
+        <div class="add-archive-form">
+          <input type="text" id="archive-sortie-input" placeholder="Nom de la sortie..." />
+          <select id="archive-sortie-year">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+          </select>
+          <button onclick="addToArchive('sorties', 'archive-sortie-input', 'archive-sortie-year', 'archive-sorties')">+</button>
+        </div>
+      </section>
+      <div id="archive-sorties"></div>
+    </div>
+
+    <!-- CARTE EUROPE -->
+    <div id="subtab-carte" class="sub-content">
+      <div class="card map-card">
+        <h2>🗺️ Mes villes visitées</h2>
+        <p class="map-hint">Clique sur la carte pour épingler une ville</p>
+        <div class="map-wrap">
+          <svg id="europe-map" viewBox="0 0 560 500" xmlns="http://www.w3.org/2000/svg">
+            <!-- Fond mer -->
+            <rect width="560" height="500" fill="#ddeeff" rx="12"/>
+            <!-- Portugal -->
+            <path d="M60,280 L70,260 L72,240 L68,220 L72,210 L70,195 L65,190 L58,200 L55,220 L53,240 L55,265 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Espagne -->
+            <path d="M70,260 L90,250 L120,248 L150,250 L175,245 L185,250 L190,265 L185,280 L175,295 L160,305 L140,310 L120,308 L100,305 L80,295 L70,280 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- France -->
+            <path d="M150,250 L175,245 L200,238 L220,235 L225,220 L215,205 L205,195 L195,188 L180,185 L165,188 L152,195 L145,210 L143,225 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- UK -->
+            <path d="M155,170 L165,155 L170,140 L165,125 L155,120 L145,128 L140,145 L142,162 L150,172 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Irlande -->
+            <path d="M128,158 L138,148 L140,135 L133,128 L122,132 L118,145 L122,158 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Belgique/Pays-Bas -->
+            <path d="M195,188 L215,185 L225,178 L225,168 L215,162 L200,165 L192,175 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Allemagne -->
+            <path d="M215,185 L235,180 L258,178 L268,185 L270,200 L265,218 L250,228 L232,230 L220,222 L215,205 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Suisse/Autriche -->
+            <path d="M225,220 L250,228 L270,225 L285,228 L290,218 L282,208 L265,205 L248,208 L232,210 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Italie -->
+            <path d="M225,235 L240,238 L248,250 L252,268 L258,288 L262,310 L255,330 L248,345 L240,348 L235,338 L238,318 L235,298 L228,278 L220,258 L218,242 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Sicile -->
+            <path d="M245,355 L258,352 L265,358 L262,365 L250,368 L242,362 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Scandinavie (Norvège/Suède) -->
+            <path d="M238,80 L255,60 L265,42 L275,28 L288,18 L300,15 L312,22 L318,38 L315,55 L308,72 L295,90 L280,105 L262,115 L245,118 L235,108 L232,95 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Danemark -->
+            <path d="M235,130 L245,118 L255,115 L260,122 L258,135 L248,140 L238,138 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Finlande -->
+            <path d="M300,15 L318,18 L340,22 L355,35 L358,52 L350,70 L338,85 L320,95 L305,100 L292,95 L285,80 L288,60 L295,42 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Pologne -->
+            <path d="M268,155 L295,148 L325,148 L340,158 L342,175 L335,188 L315,195 L292,198 L272,195 L262,182 L262,168 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Rép. Tchèque/Slovaquie -->
+            <path d="M270,200 L292,198 L315,195 L330,200 L332,212 L318,220 L295,222 L275,218 L268,208 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Hongrie/Roumanie -->
+            <path d="M295,222 L325,220 L355,222 L375,235 L378,252 L368,268 L348,278 L325,280 L305,275 L290,262 L288,245 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Balkans -->
+            <path d="M290,262 L310,275 L330,280 L350,278 L368,268 L372,285 L365,300 L350,315 L332,322 L312,320 L295,308 L282,292 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Grèce -->
+            <path d="M318,320 L335,322 L345,332 L340,345 L328,352 L315,348 L308,335 L312,322 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- États baltes + Belarus -->
+            <path d="M295,118 L325,115 L352,118 L368,130 L365,148 L340,158 L315,155 L292,148 L285,135 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Ukraine -->
+            <path d="M340,158 L368,152 L400,148 L428,155 L438,170 L432,188 L415,200 L390,208 L365,210 L342,205 L330,195 L332,178 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+            <!-- Russie (partie européenne) -->
+            <path d="M340,22 L380,18 L420,15 L460,20 L490,35 L500,55 L495,80 L480,105 L455,125 L428,138 L400,148 L368,152 L352,135 L355,108 L345,85 L338,62 Z" fill="#c8d8a8" stroke="#aaa" stroke-width="0.8"/>
+          </svg>
+          <div id="map-pins"></div>
+        </div>
+        <div id="pin-list" class="pin-list"></div>
       </div>
-    </section>
-    <div id="archive-visits"></div>
+    </div>
+
   </main>
 
   <!-- BOTTOM NAV -->
@@ -203,7 +291,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="app.js?v=16"></script>
+  <script src="app.js?v=17"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js');

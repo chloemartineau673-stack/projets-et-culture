@@ -1,9 +1,9 @@
-const CACHE = 'projets-culture-v14';
+const CACHE = 'projets-culture-v17';
 const ASSETS = [
   '/',
   '/index.html',
-  '/style.css?v=14',
-  '/app.js?v=14',
+  '/style.css?v=17',
+  '/app.js?v=17',
   '/manifest.json',
 ];
 

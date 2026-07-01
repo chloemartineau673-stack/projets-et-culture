@@ -24,11 +24,15 @@ try {
 function pushToCloud() {
   if (!cloudDoc || applyingCloud) return;
   cloudDoc.set({
-    amount: parseFloat(localStorage.getItem('japan_amount') || '0'),
-    books:  JSON.parse(localStorage.getItem('books')  || '[]'),
-    videos: JSON.parse(localStorage.getItem('videos') || '[]'),
-    visits: JSON.parse(localStorage.getItem('visits') || '[]'),
-    updated: Date.now(),
+    amount:   parseFloat(localStorage.getItem('japan_amount') || '0'),
+    books:    JSON.parse(localStorage.getItem('books')    || '[]'),
+    videos:   JSON.parse(localStorage.getItem('videos')   || '[]'),
+    visits:   JSON.parse(localStorage.getItem('visits')   || '[]'),
+    films:    JSON.parse(localStorage.getItem('films')    || '[]'),
+    voyages:  JSON.parse(localStorage.getItem('voyages')  || '[]'),
+    sorties:  JSON.parse(localStorage.getItem('sorties')  || '[]'),
+    mapPins:  JSON.parse(localStorage.getItem('mapPins')  || '[]'),
+    updated:  Date.now(),
   }).catch(e => console.error('Cloud push', e));
 }
 
@@ -39,10 +43,13 @@ function startCloudSync() {
     const d = snap.data();
     applyingCloud = true;
     localStorage.setItem('japan_amount', d.amount ?? 0);
-    localStorage.setItem('books',  JSON.stringify(d.books  || []));
-    localStorage.setItem('videos', JSON.stringify(d.videos || []));
-    localStorage.setItem('visits', JSON.stringify(d.visits || []));
-    localStorage.setItem('films',  JSON.stringify(d.films  || []));
+    localStorage.setItem('books',   JSON.stringify(d.books   || []));
+    localStorage.setItem('videos',  JSON.stringify(d.videos  || []));
+    localStorage.setItem('visits',  JSON.stringify(d.visits  || []));
+    localStorage.setItem('films',   JSON.stringify(d.films   || []));
+    localStorage.setItem('voyages', JSON.stringify(d.voyages || []));
+    localStorage.setItem('sorties', JSON.stringify(d.sorties || []));
+    localStorage.setItem('mapPins', JSON.stringify(d.mapPins || []));
     applyingCloud = false;
     renderAll();
   }, err => console.error('Cloud listen', err));
@@ -53,11 +60,19 @@ function renderAll() {
   renderList('books',  'book-list');
   renderList('videos', 'video-list');
   renderList('visits', 'visit-list');
+  renderList('films',  'film-list');
+
+  const tabVisites = document.getElementById('tab-visites');
+  if (tabVisites && tabVisites.classList.contains('active')) {
+    renderArchive('voyages', 'archive-voyages', '✈️');
+    renderArchive('sorties', 'archive-sorties', '🎭');
+    renderPins();
+  }
+
   const archives = {
-    livres:  ['books',  'archive-books',  '📚'],
-    videos:  ['videos', 'archive-videos', '🎬'],
-    films:   ['films',  'archive-films',  '🎥'],
-    visites: ['visits', 'archive-visits', '🏛️'],
+    livres: ['books',  'archive-books',  '📚'],
+    videos: ['videos', 'archive-videos', '🎬'],
+    films:  ['films',  'archive-films',  '🎥'],
   };
   Object.entries(archives).forEach(([tab, [key, cont, emo]]) => {
     const el = document.getElementById('tab-' + tab);
@@ -128,11 +143,14 @@ window.addEventListener('resize', renderBgIcons);
 
 function loadData() {
   return {
-    amount: parseFloat(localStorage.getItem('japan_amount') || '0'),
-    books:  JSON.parse(localStorage.getItem('books')  || '[]'),
-    videos: JSON.parse(localStorage.getItem('videos') || '[]'),
-    visits: JSON.parse(localStorage.getItem('visits') || '[]'),
-    films:  JSON.parse(localStorage.getItem('films')  || '[]'),
+    amount:  parseFloat(localStorage.getItem('japan_amount') || '0'),
+    books:   JSON.parse(localStorage.getItem('books')   || '[]'),
+    videos:  JSON.parse(localStorage.getItem('videos')  || '[]'),
+    visits:  JSON.parse(localStorage.getItem('visits')  || '[]'),
+    films:   JSON.parse(localStorage.getItem('films')   || '[]'),
+    voyages: JSON.parse(localStorage.getItem('voyages') || '[]'),
+    sorties: JSON.parse(localStorage.getItem('sorties') || '[]'),
+    mapPins: JSON.parse(localStorage.getItem('mapPins') || '[]'),
   };
 }
 
@@ -150,7 +168,19 @@ function showTab(name) {
   if (name === 'livres')  renderArchive('books',  'archive-books',  '📚');
   if (name === 'videos')  renderArchive('videos', 'archive-videos', '🎬');
   if (name === 'films')   renderArchive('films',  'archive-films',  '🎥');
-  if (name === 'visites') renderArchive('visits', 'archive-visits', '🏛️');
+  if (name === 'visites') {
+    renderArchive('voyages', 'archive-voyages', '✈️');
+    renderArchive('sorties', 'archive-sorties', '🎭');
+    renderPins();
+  }
+}
+
+function showSubTab(name) {
+  document.querySelectorAll('.sub-tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sub-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('subtab-' + name).classList.add('active');
+  document.querySelector(`.sub-tab[onclick="showSubTab('${name}')"]`).classList.add('active');
+  if (name === 'carte') renderPins();
 }
 
 // ─── Japan progress ────────────────────────────────────────────────────────
@@ -414,7 +444,7 @@ function bestYear(done) {
 }
 
 function addToArchive(key, inputId, yearId, containerId) {
-  const emojiMap = { books: '📚', videos: '🎬', visits: '🏛️', films: '🎥' };
+  const emojiMap = { books: '📚', videos: '🎬', visits: '🏛️', films: '🎥', voyages: '✈️', sorties: '🎭' };
   const text = document.getElementById(inputId).value.trim();
   const year = parseInt(document.getElementById(yearId).value);
   if (!text) return;
@@ -433,8 +463,8 @@ function unarchiveItem(key, index, containerId, emoji) {
   data[key][index].doneDate = null;
   saveList(key, data[key]);
 
-  const listMap = { books: 'book-list', videos: 'video-list', visits: 'visit-list' };
-  renderList(key, listMap[key]);
+  const listMap = { books: 'book-list', videos: 'video-list', visits: 'visit-list', films: 'film-list' };
+  if (listMap[key]) renderList(key, listMap[key]);
   renderArchive(key, containerId, emoji);
 }
 
@@ -444,6 +474,58 @@ function deleteArchiveItem(key, index, containerId, emoji) {
   data[key].splice(index, 1);
   saveList(key, data[key]);
   renderArchive(key, containerId, emoji);
+}
+
+// ─── Carte Europe – épingles ──────────────────────────────────────────────
+
+function renderPins() {
+  const data = loadData();
+  const pins = data.mapPins;
+  const pinsDiv = document.getElementById('map-pins');
+  const pinList = document.getElementById('pin-list');
+  if (!pinsDiv || !pinList) return;
+
+  pinsDiv.innerHTML = '';
+  pinList.innerHTML = '';
+
+  pins.forEach((pin, i) => {
+    const marker = document.createElement('div');
+    marker.className = 'map-pin';
+    marker.style.left = pin.x + '%';
+    marker.style.top  = pin.y + '%';
+    marker.innerHTML = `<span class="map-pin-icon">📍</span><span class="map-pin-label">${pin.city}</span>`;
+    marker.addEventListener('click', () => {
+      if (confirm('Supprimer l\'épingle "' + pin.city + '" ?')) {
+        const d = loadData();
+        d.mapPins.splice(i, 1);
+        saveList('mapPins', d.mapPins);
+        renderPins();
+      }
+    });
+    pinsDiv.appendChild(marker);
+
+    const chip = document.createElement('div');
+    chip.className = 'pin-chip';
+    chip.innerHTML = `📍 ${pin.city} <button title="Supprimer" onclick="(function(){var d=loadData();d.mapPins.splice(${i},1);saveList('mapPins',d.mapPins);renderPins();})()">✕</button>`;
+    pinList.appendChild(chip);
+  });
+}
+
+function initMap() {
+  const wrap = document.querySelector('.map-wrap');
+  if (!wrap) return;
+  wrap.addEventListener('click', e => {
+    if (e.target.closest('.map-pin')) return;
+    const rect = wrap.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width  * 100).toFixed(2);
+    const y = ((e.clientY - rect.top)  / rect.height * 100).toFixed(2);
+    const city = prompt('Nom de la ville visitée :');
+    if (!city || !city.trim()) return;
+    const data = loadData();
+    data.mapPins.push({ city: city.trim(), x: parseFloat(x), y: parseFloat(y) });
+    saveList('mapPins', data.mapPins);
+    renderPins();
+  });
 }
 
 // ─── Enter key support ─────────────────────────────────────────────────────
@@ -459,6 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
   Object.entries(map).forEach(([id, fn]) => {
     document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') fn(); });
   });
+
+  initMap();
 });
 
 // ─── Init ──────────────────────────────────────────────────────────────────
