@@ -1,10 +1,10 @@
 const CACHE = 'projets-culture-v14';
 const ASSETS = [
-  '/projets-et-culture/',
-  '/projets-et-culture/index.html',
-  '/projets-et-culture/style.css?v=14',
-  '/projets-et-culture/app.js?v=14',
-  '/projets-et-culture/manifest.json',
+  '/',
+  '/index.html',
+  '/style.css?v=14',
+  '/app.js?v=14',
+  '/manifest.json',
 ];
 
 self.addEventListener('install', e => {
