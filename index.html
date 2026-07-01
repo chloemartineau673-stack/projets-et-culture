@@ -11,7 +11,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Projets & Culture</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=14" />
+  <link rel="stylesheet" href="style.css?v=16" />
 </head>
 <body>
   <div id="bg-icons"></div>
@@ -69,7 +69,7 @@
 
       </div>
 
-      <!-- Colonne droite : Livres + Vidéos -->
+      <!-- Colonne droite : Livres + Vidéos + Films -->
       <div class="home-col">
 
         <section class="card">
@@ -90,6 +90,15 @@
           <ul id="video-list" class="item-list"></ul>
         </section>
 
+        <section class="card">
+          <h2>🎥 Films & Séries à voir</h2>
+          <div class="add-item">
+            <input type="text" id="film-input" placeholder="Ajouter un film ou série..." />
+            <button onclick="addItem('films', 'film-input', 'film-list')">+</button>
+          </div>
+          <ul id="film-list" class="item-list"></ul>
+        </section>
+
       </div>
 
     </div>
@@ -103,6 +112,7 @@
       <div class="add-archive-form">
         <input type="text" id="archive-book-input" placeholder="Titre du livre..." />
         <select id="archive-book-year">
+          <option value="2026">2026</option>
           <option value="2025">2025</option>
           <option value="2024">2024</option>
           <option value="2023">2023</option>
@@ -120,6 +130,7 @@
       <div class="add-archive-form">
         <input type="text" id="archive-video-input" placeholder="Titre de la vidéo..." />
         <select id="archive-video-year">
+          <option value="2026">2026</option>
           <option value="2025">2025</option>
           <option value="2024">2024</option>
           <option value="2023">2023</option>
@@ -130,6 +141,24 @@
     <div id="archive-videos"></div>
   </main>
 
+  <!-- ARCHIVES FILMS & SÉRIES -->
+  <main id="tab-films" class="tab-content">
+    <section class="card add-archive-card">
+      <h2>🎥 Ajouter un film ou série vu</h2>
+      <div class="add-archive-form">
+        <input type="text" id="archive-film-input" placeholder="Titre du film ou série..." />
+        <select id="archive-film-year">
+          <option value="2026">2026</option>
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+        </select>
+        <button onclick="addToArchive('films', 'archive-film-input', 'archive-film-year', 'archive-films')">+</button>
+      </div>
+    </section>
+    <div id="archive-films"></div>
+  </main>
+
   <!-- ARCHIVES VISITES -->
   <main id="tab-visites" class="tab-content">
     <section class="card add-archive-card">
@@ -137,6 +166,7 @@
       <div class="add-archive-form">
         <input type="text" id="archive-visit-input" placeholder="Nom de la visite..." />
         <select id="archive-visit-year">
+          <option value="2026">2026</option>
           <option value="2025">2025</option>
           <option value="2024">2024</option>
           <option value="2023">2023</option>
@@ -161,6 +191,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="15" height="10" rx="2"/><polygon points="17 9 22 6 22 18 17 15"/></svg>
       <span>Vidéos</span>
     </button>
+    <button class="nav-btn" onclick="showTab('films')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M17 7h5M2 17h5M17 17h5"/></svg>
+      <span>Films</span>
+    </button>
     <button class="nav-btn" onclick="showTab('visites')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
       <span>Visites</span>
@@ -169,7 +203,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="app.js?v=15"></script>
+  <script src="app.js?v=16"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js');

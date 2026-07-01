@@ -42,6 +42,7 @@ function startCloudSync() {
     localStorage.setItem('books',  JSON.stringify(d.books  || []));
     localStorage.setItem('videos', JSON.stringify(d.videos || []));
     localStorage.setItem('visits', JSON.stringify(d.visits || []));
+    localStorage.setItem('films',  JSON.stringify(d.films  || []));
     applyingCloud = false;
     renderAll();
   }, err => console.error('Cloud listen', err));
@@ -55,6 +56,7 @@ function renderAll() {
   const archives = {
     livres:  ['books',  'archive-books',  '📚'],
     videos:  ['videos', 'archive-videos', '🎬'],
+    films:   ['films',  'archive-films',  '🎥'],
     visites: ['visits', 'archive-visits', '🏛️'],
   };
   Object.entries(archives).forEach(([tab, [key, cont, emo]]) => {
@@ -130,6 +132,7 @@ function loadData() {
     books:  JSON.parse(localStorage.getItem('books')  || '[]'),
     videos: JSON.parse(localStorage.getItem('videos') || '[]'),
     visits: JSON.parse(localStorage.getItem('visits') || '[]'),
+    films:  JSON.parse(localStorage.getItem('films')  || '[]'),
   };
 }
 
@@ -146,6 +149,7 @@ function showTab(name) {
 
   if (name === 'livres')  renderArchive('books',  'archive-books',  '📚');
   if (name === 'videos')  renderArchive('videos', 'archive-videos', '🎬');
+  if (name === 'films')   renderArchive('films',  'archive-films',  '🎥');
   if (name === 'visites') renderArchive('visits', 'archive-visits', '🏛️');
 }
 
@@ -311,6 +315,25 @@ function renderArchive(key, containerId, emoji) {
 
   // Stats globales
   const years = [...new Set(done.map(i => getYear(i.doneDate)))].sort((a, b) => b - a);
+  const countsByYear = {};
+  done.forEach(i => {
+    const y = getYear(i.doneDate);
+    countsByYear[y] = (countsByYear[y] || 0) + 1;
+  });
+  const maxCount = Math.max(...Object.values(countsByYear), 1);
+
+  const yearBarsHtml = years.map(y => {
+    const pct = Math.round((countsByYear[y] / maxCount) * 100);
+    return `
+      <div class="year-bar-row">
+        <span class="year-bar-label">${y}</span>
+        <div class="year-bar-track">
+          <div class="year-bar-fill" style="width:${pct}%"></div>
+        </div>
+        <span class="year-bar-count">${countsByYear[y]}</span>
+      </div>`;
+  }).join('');
+
   const statsEl = document.createElement('div');
   statsEl.className = 'stats-global card';
   statsEl.innerHTML = `
@@ -328,7 +351,8 @@ function renderArchive(key, containerId, emoji) {
         <span class="stat-num">${bestYear(done)}</span>
         <span class="stat-label">Meilleure année</span>
       </div>
-    </div>`;
+    </div>
+    <div class="year-bars">${yearBarsHtml}</div>`;
   container.appendChild(statsEl);
 
   // Par année
@@ -390,7 +414,7 @@ function bestYear(done) {
 }
 
 function addToArchive(key, inputId, yearId, containerId) {
-  const emojiMap = { books: '📚', videos: '🎬', visits: '🏛️' };
+  const emojiMap = { books: '📚', videos: '🎬', visits: '🏛️', films: '🎥' };
   const text = document.getElementById(inputId).value.trim();
   const year = parseInt(document.getElementById(yearId).value);
   if (!text) return;
@@ -430,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'book-input':   () => addItem('books',  'book-input',  'book-list'),
     'video-input':  () => addItem('videos', 'video-input', 'video-list'),
     'visit-input':  () => addItem('visits', 'visit-input', 'visit-list'),
+    'film-input':   () => addItem('films',  'film-input',  'film-list'),
   };
   Object.entries(map).forEach(([id, fn]) => {
     document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') fn(); });
@@ -443,5 +468,6 @@ updateProgress(_init.amount);
 renderList('books',  'book-list');
 renderList('videos', 'video-list');
 renderList('visits', 'visit-list');
+renderList('films',  'film-list');
 
 startCloudSync();
