@@ -169,6 +169,11 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=15"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/projets-et-culture/sw.js');
+    }
+  </script>
 </body>
 </html>
