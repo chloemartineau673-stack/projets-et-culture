@@ -1,9 +1,9 @@
-const CACHE = 'projets-culture-v20';
+const CACHE = 'projets-culture-v21';
 const ASSETS = [
   '/',
   '/index.html',
-  '/style.css?v=20',
-  '/app.js?v=20',
+  '/style.css?v=21',
+  '/app.js?v=21',
   '/manifest.json',
 ];
 
@@ -22,8 +22,11 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Firebase et CDN : toujours réseau
-  if (e.request.url.includes('firebase') || e.request.url.includes('gstatic')) {
+  // Ressources externes : toujours réseau
+  const url = e.request.url;
+  if (url.includes('firebase') || url.includes('gstatic') ||
+      url.includes('openstreetmap') || url.includes('unpkg') ||
+      url.includes('leaflet')) {
     return;
   }
   e.respondWith(

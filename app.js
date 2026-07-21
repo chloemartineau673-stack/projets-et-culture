@@ -178,7 +178,7 @@ function showSubTab(name) {
   document.querySelectorAll('.sub-content').forEach(el => el.classList.remove('active'));
   document.getElementById('subtab-' + name).classList.add('active');
   document.querySelector(`.sub-tab[onclick="showSubTab('${name}')"]`).classList.add('active');
-  if (name === 'carte') renderPins();
+  if (name === 'carte') setTimeout(initMap, 50);
   if (name === 'preparation') renderPackingList();
   if (name === 'voyages') renderVoyages();
 }
@@ -758,56 +758,85 @@ function uncheckAll() {
   renderPackingList();
 }
 
-// ─── Carte Europe – épingles ──────────────────────────────────────────────
+// ─── Carte Monde (Leaflet) ────────────────────────────────────────────────
+
+let leafletMap = null;
+let leafletMarkers = [];
 
 function renderPins() {
-  const data = loadData();
-  const pins = data.mapPins;
-  const pinsDiv = document.getElementById('map-pins');
-  const pinList = document.getElementById('pin-list');
-  if (!pinsDiv || !pinList) return;
+  if (!leafletMap) return;
 
-  pinsDiv.innerHTML = '';
-  pinList.innerHTML = '';
+  leafletMarkers.forEach(m => m.remove());
+  leafletMarkers = [];
+
+  const pinList = document.getElementById('pin-list');
+  if (pinList) pinList.innerHTML = '';
+
+  const pins = loadData().mapPins.filter(p => p.lat !== undefined);
 
   pins.forEach((pin, i) => {
-    const marker = document.createElement('div');
-    marker.className = 'map-pin';
-    marker.style.left = pin.x + '%';
-    marker.style.top  = pin.y + '%';
-    marker.innerHTML = `<span class="map-pin-icon">📍</span><span class="map-pin-label">${pin.city}</span>`;
-    marker.addEventListener('click', () => {
-      if (confirm('Supprimer l\'épingle "' + pin.city + '" ?')) {
-        const d = loadData();
-        d.mapPins.splice(i, 1);
-        saveList('mapPins', d.mapPins);
-        renderPins();
-      }
+    const icon = L.divIcon({
+      html: `<div class="lf-pin-wrap"><span class="lf-dot"></span><span class="lf-label">${escapeHtml(pin.city)}</span></div>`,
+      className: '',
+      iconSize: null,
+      iconAnchor: [6, 6],
     });
-    pinsDiv.appendChild(marker);
 
-    const chip = document.createElement('div');
-    chip.className = 'pin-chip';
-    chip.innerHTML = `📍 ${pin.city} <button title="Supprimer" onclick="(function(){var d=loadData();d.mapPins.splice(${i},1);saveList('mapPins',d.mapPins);renderPins();})()">✕</button>`;
-    pinList.appendChild(chip);
+    const marker = L.marker([pin.lat, pin.lng], { icon }).addTo(leafletMap);
+    marker.bindPopup(
+      `<b>${escapeHtml(pin.city)}</b><br>
+       <button onclick="deletePin(${i})" style="margin-top:6px;padding:4px 10px;background:#e74c3c;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px">Supprimer</button>`
+    );
+    leafletMarkers.push(marker);
+
+    if (pinList) {
+      const chip = document.createElement('div');
+      chip.className = 'pin-chip';
+      chip.innerHTML = `📍 ${escapeHtml(pin.city)} <button onclick="deletePin(${i})">✕</button>`;
+      pinList.appendChild(chip);
+    }
   });
 }
 
+function deletePin(i) {
+  const d = loadData();
+  const validPins = d.mapPins.filter(p => p.lat !== undefined);
+  const target = validPins[i];
+  const idx = d.mapPins.indexOf(target);
+  if (idx !== -1) d.mapPins.splice(idx, 1);
+  saveList('mapPins', d.mapPins);
+  if (leafletMap) leafletMap.closePopup();
+  renderPins();
+}
+
 function initMap() {
-  const wrap = document.querySelector('.map-wrap');
-  if (!wrap) return;
-  wrap.addEventListener('click', e => {
-    if (e.target.closest('.map-pin')) return;
-    const rect = wrap.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width  * 100).toFixed(2);
-    const y = ((e.clientY - rect.top)  / rect.height * 100).toFixed(2);
+  if (typeof L === 'undefined') return;
+  const container = document.getElementById('world-map');
+  if (!container) return;
+
+  if (leafletMap) {
+    leafletMap.invalidateSize();
+    renderPins();
+    return;
+  }
+
+  leafletMap = L.map('world-map', { center: [20, 10], zoom: 2, minZoom: 2 });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom: 18,
+  }).addTo(leafletMap);
+
+  leafletMap.on('click', e => {
     const city = prompt('Nom de la ville visitée :');
     if (!city || !city.trim()) return;
-    const data = loadData();
-    data.mapPins.push({ city: city.trim(), x: parseFloat(x), y: parseFloat(y) });
-    saveList('mapPins', data.mapPins);
+    const d = loadData();
+    d.mapPins.push({ city: city.trim(), lat: e.latlng.lat, lng: e.latlng.lng });
+    saveList('mapPins', d.mapPins);
     renderPins();
   });
+
+  renderPins();
 }
 
 // ─── Enter key support ─────────────────────────────────────────────────────
@@ -824,7 +853,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') fn(); });
   });
 
-  initMap();
 });
 
 // ─── Init ──────────────────────────────────────────────────────────────────
