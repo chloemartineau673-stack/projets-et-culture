@@ -478,6 +478,10 @@ function deleteArchiveItem(key, index, containerId, emoji) {
 
 // ─── Voyages ──────────────────────────────────────────────────────────────
 
+let expandedVoyage = null;
+
+const INFO_CHIPS = ['💰 Monnaie','🗣️ Langue','🌡️ Météo','🛂 Visa','🔌 Prise électrique','🏥 Urgences','📞 Ambassade','✈️ Compagnie aérienne','🏨 Hôtel','🚗 Transport'];
+
 function toggleVoyageForm() {
   const form = document.getElementById('voyage-form-card');
   const btn  = document.getElementById('btn-add-voyage');
@@ -494,12 +498,13 @@ function saveVoyage() {
   const dates = document.getElementById('voyage-date-input').value.trim();
   const notes = document.getElementById('voyage-notes-input').value.trim();
   const trips = JSON.parse(localStorage.getItem('trips') || '[]');
-  trips.unshift({ destination: dest, dates, notes, status: 'planifié', createdAt: new Date().toISOString() });
+  trips.unshift({ destination: dest, dates, notes, status: 'planifié', infos: [], createdAt: new Date().toISOString() });
   saveList('trips', trips);
   document.getElementById('voyage-dest-input').value = '';
   document.getElementById('voyage-date-input').value = '';
   document.getElementById('voyage-notes-input').value = '';
   toggleVoyageForm();
+  expandedVoyage = 0;
   renderVoyages();
 }
 
@@ -507,6 +512,7 @@ function deleteVoyage(i) {
   if (!confirm('Supprimer ce voyage ?')) return;
   const trips = JSON.parse(localStorage.getItem('trips') || '[]');
   trips.splice(i, 1);
+  expandedVoyage = null;
   saveList('trips', trips);
   renderVoyages();
 }
@@ -514,6 +520,47 @@ function deleteVoyage(i) {
 function toggleVoyageStatus(i) {
   const trips = JSON.parse(localStorage.getItem('trips') || '[]');
   trips[i].status = trips[i].status === 'planifié' ? 'passé' : 'planifié';
+  saveList('trips', trips);
+  renderVoyages();
+}
+
+function toggleVoyageExpand(i) {
+  expandedVoyage = expandedVoyage === i ? null : i;
+  renderVoyages();
+}
+
+function updateVoyage(i) {
+  const dest = document.getElementById(`vedit-dest-${i}`).value.trim();
+  if (!dest) return;
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  trips[i].destination = dest;
+  trips[i].dates = document.getElementById(`vedit-dates-${i}`).value.trim();
+  trips[i].notes = document.getElementById(`vedit-notes-${i}`).value.trim();
+  saveList('trips', trips);
+  renderVoyages();
+}
+
+function prefillInfo(i, label) {
+  const lbl = document.getElementById(`info-lbl-${i}`);
+  const val = document.getElementById(`info-val-${i}`);
+  if (lbl) lbl.value = label;
+  if (val) val.focus();
+}
+
+function addVoyageInfo(i) {
+  const lbl = document.getElementById(`info-lbl-${i}`).value.trim();
+  const val = document.getElementById(`info-val-${i}`).value.trim();
+  if (!lbl || !val) return;
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  if (!trips[i].infos) trips[i].infos = [];
+  trips[i].infos.push({ label: lbl, value: val });
+  saveList('trips', trips);
+  renderVoyages();
+}
+
+function deleteVoyageInfo(i, ii) {
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  trips[i].infos.splice(ii, 1);
   saveList('trips', trips);
   renderVoyages();
 }
@@ -528,20 +575,56 @@ function renderVoyages() {
     return;
   }
 
-  container.innerHTML = trips.map((v, i) => `
-    <div class="voyage-card ${v.status === 'passé' ? 'voyage-past' : ''}">
-      <div class="voyage-card-top">
-        <span class="voyage-icon">${v.status === 'passé' ? '✅' : '✈️'}</span>
-        <div class="voyage-info">
-          <div class="voyage-destination">${escapeHtml(v.destination)}</div>
-          ${v.dates ? `<div class="voyage-dates">📅 ${escapeHtml(v.dates)}</div>` : ''}
+  container.innerHTML = trips.map((v, i) => {
+    const isOpen  = expandedVoyage === i;
+    const infos   = v.infos || [];
+    const past    = v.status === 'passé';
+
+    const expandedHtml = isOpen ? `
+      <div class="voyage-expanded-body">
+        <div class="voyage-edit-form">
+          <input id="vedit-dest-${i}"  value="${escapeHtml(v.destination)}"    placeholder="Destination…">
+          <input id="vedit-dates-${i}" value="${escapeHtml(v.dates || '')}"    placeholder="Dates (ex: mars 2026)">
+          <textarea id="vedit-notes-${i}" placeholder="Notes…">${escapeHtml(v.notes || '')}</textarea>
+          <div class="vedit-actions">
+            <button class="btn-vedit-save"   onclick="updateVoyage(${i})">💾 Enregistrer</button>
+            <button class="btn-vedit-delete" onclick="deleteVoyage(${i})">🗑️ Supprimer</button>
+          </div>
         </div>
-        <button class="voyage-status-btn ${v.status}" onclick="toggleVoyageStatus(${i})">${v.status === 'passé' ? 'Passé' : 'Planifié'}</button>
-        <button class="btn-archive-delete" onclick="deleteVoyage(${i})">✕</button>
-      </div>
-      ${v.notes ? `<div class="voyage-notes">${escapeHtml(v.notes)}</div>` : ''}
-    </div>
-  `).join('');
+        <div class="voyage-infos-section">
+          <h4>📌 Infos pratiques</h4>
+          ${infos.length ? `<div class="voyage-infos-list">${infos.map((inf, ii) => `
+            <div class="voyage-info-item">
+              <span class="info-label">${escapeHtml(inf.label)}</span>
+              <span class="info-value">${escapeHtml(inf.value)}</span>
+              <button class="btn-delete-info" onclick="deleteVoyageInfo(${i},${ii})">✕</button>
+            </div>`).join('')}</div>` : ''}
+          <div class="info-suggestions">
+            ${INFO_CHIPS.map(s => `<button class="info-chip" onclick="prefillInfo(${i},\`${s}\`)">${s}</button>`).join('')}
+          </div>
+          <div class="add-info-row">
+            <input id="info-lbl-${i}" placeholder="Info…"   onkeydown="if(event.key==='Enter')document.getElementById('info-val-${i}').focus()">
+            <input id="info-val-${i}" placeholder="Valeur…" onkeydown="if(event.key==='Enter')addVoyageInfo(${i})">
+            <button onclick="addVoyageInfo(${i})">+</button>
+          </div>
+        </div>
+      </div>` : '';
+
+    return `
+      <div class="voyage-card ${past ? 'voyage-past' : ''} ${isOpen ? 'voyage-open' : ''}">
+        <div class="voyage-card-top" onclick="toggleVoyageExpand(${i})">
+          <span class="voyage-icon">${past ? '✅' : '✈️'}</span>
+          <div class="voyage-info">
+            <div class="voyage-destination">${escapeHtml(v.destination)}</div>
+            ${v.dates ? `<div class="voyage-dates">📅 ${escapeHtml(v.dates)}</div>` : ''}
+          </div>
+          <button class="voyage-status-btn ${v.status}" onclick="event.stopPropagation();toggleVoyageStatus(${i})">${past ? 'Passé' : 'Planifié'}</button>
+          <span class="voyage-chevron ${isOpen ? 'open' : ''}">›</span>
+        </div>
+        ${!isOpen && v.notes ? `<div class="voyage-notes">${escapeHtml(v.notes)}</div>` : ''}
+        ${expandedHtml}
+      </div>`;
+  }).join('');
 }
 
 // ─── Liste de préparation ─────────────────────────────────────────────────
