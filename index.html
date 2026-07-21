@@ -11,7 +11,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Projets & Culture</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="style.css?v=19" />
 </head>
 <body>
   <div id="bg-icons"></div>
@@ -160,49 +160,49 @@
     <div id="archive-films"></div>
   </main>
 
-  <!-- VISITES : sous-onglets -->
-  <main id="tab-visites" class="tab-content visites-main">
+  <!-- VACANCES : sous-onglets -->
+  <main id="tab-vacances" class="tab-content visites-main">
 
     <nav class="sub-tabs">
       <button class="sub-tab active" onclick="showSubTab('voyages')">✈️ Voyages</button>
-      <button class="sub-tab" onclick="showSubTab('sorties')">🎭 Sorties</button>
+      <button class="sub-tab" onclick="showSubTab('preparation')">🧳 Préparation</button>
       <button class="sub-tab" onclick="showSubTab('carte')">🗺️ Carte</button>
     </nav>
 
     <!-- VOYAGES -->
     <div id="subtab-voyages" class="sub-content active">
-      <section class="card add-archive-card">
-        <h2>✈️ Ajouter un voyage</h2>
-        <div class="add-archive-form">
-          <input type="text" id="archive-voyage-input" placeholder="Destination..." />
-          <select id="archive-voyage-year">
-            <option value="2026">2026</option>
-            <option value="2025">2025</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
-          </select>
-          <button onclick="addToArchive('voyages', 'archive-voyage-input', 'archive-voyage-year', 'archive-voyages')">+</button>
+      <div id="trips-list"></div>
+      <button class="btn-add-voyage" id="btn-add-voyage" onclick="toggleVoyageForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ajouter un voyage
+      </button>
+      <div class="card voyage-form-card" id="voyage-form-card" style="display:none">
+        <h3>✈️ Nouveau voyage</h3>
+        <div class="voyage-form">
+          <input type="text" id="voyage-dest-input" placeholder="Destination (ex: Japon)..." />
+          <input type="text" id="voyage-date-input" placeholder="Dates (ex: mars 2026)" />
+          <textarea id="voyage-notes-input" placeholder="Notes, idées, budget..." rows="2"></textarea>
+          <div class="voyage-form-actions">
+            <button class="btn-save-voyage" onclick="saveVoyage()">Enregistrer</button>
+            <button class="btn-cancel-voyage" onclick="toggleVoyageForm()">Annuler</button>
+          </div>
         </div>
-      </section>
-      <div id="archive-voyages"></div>
+      </div>
     </div>
 
-    <!-- SORTIES & ACTIVITÉS -->
-    <div id="subtab-sorties" class="sub-content">
-      <section class="card add-archive-card">
-        <h2>🎭 Ajouter une sortie</h2>
-        <div class="add-archive-form">
-          <input type="text" id="archive-sortie-input" placeholder="Nom de la sortie..." />
-          <select id="archive-sortie-year">
-            <option value="2026">2026</option>
-            <option value="2025">2025</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
-          </select>
-          <button onclick="addToArchive('sorties', 'archive-sortie-input', 'archive-sortie-year', 'archive-sorties')">+</button>
+    <!-- PRÉPARATION -->
+    <div id="subtab-preparation" class="sub-content">
+      <div class="card prep-card">
+        <div class="prep-header">
+          <h2>🧳 Liste de préparation</h2>
+          <button class="btn-uncheck-all" onclick="uncheckAll()">↺ Tout décocher</button>
         </div>
-      </section>
-      <div id="archive-sorties"></div>
+        <div id="packing-categories"></div>
+        <div class="add-category-row">
+          <input type="text" id="new-category-input" placeholder="Nouvelle catégorie..." onkeydown="if(event.key==='Enter')addCategory()" />
+          <button class="btn-add-category" onclick="addCategory()">+ Catégorie</button>
+        </div>
+      </div>
     </div>
 
     <!-- CARTE EUROPE -->
@@ -330,15 +330,15 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M17 7h5M2 17h5M17 17h5"/></svg>
       <span>Films</span>
     </button>
-    <button class="nav-btn" onclick="showTab('visites')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
-      <span>Visites</span>
+    <button class="nav-btn" onclick="showTab('vacances')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+      <span>Vacances</span>
     </button>
   </nav>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="app.js?v=18"></script>
+  <script src="app.js?v=19"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js');

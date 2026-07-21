@@ -24,15 +24,15 @@ try {
 function pushToCloud() {
   if (!cloudDoc || applyingCloud) return;
   cloudDoc.set({
-    amount:   parseFloat(localStorage.getItem('japan_amount') || '0'),
-    books:    JSON.parse(localStorage.getItem('books')    || '[]'),
-    videos:   JSON.parse(localStorage.getItem('videos')   || '[]'),
-    visits:   JSON.parse(localStorage.getItem('visits')   || '[]'),
-    films:    JSON.parse(localStorage.getItem('films')    || '[]'),
-    voyages:  JSON.parse(localStorage.getItem('voyages')  || '[]'),
-    sorties:  JSON.parse(localStorage.getItem('sorties')  || '[]'),
-    mapPins:  JSON.parse(localStorage.getItem('mapPins')  || '[]'),
-    updated:  Date.now(),
+    amount:      parseFloat(localStorage.getItem('japan_amount') || '0'),
+    books:       JSON.parse(localStorage.getItem('books')       || '[]'),
+    videos:      JSON.parse(localStorage.getItem('videos')      || '[]'),
+    visits:      JSON.parse(localStorage.getItem('visits')      || '[]'),
+    films:       JSON.parse(localStorage.getItem('films')       || '[]'),
+    trips:       JSON.parse(localStorage.getItem('trips')       || '[]'),
+    mapPins:     JSON.parse(localStorage.getItem('mapPins')     || '[]'),
+    packingList: JSON.parse(localStorage.getItem('packingList') || '[]'),
+    updated:     Date.now(),
   }).catch(e => console.error('Cloud push', e));
 }
 
@@ -43,13 +43,15 @@ function startCloudSync() {
     const d = snap.data();
     applyingCloud = true;
     localStorage.setItem('japan_amount', d.amount ?? 0);
-    localStorage.setItem('books',   JSON.stringify(d.books   || []));
-    localStorage.setItem('videos',  JSON.stringify(d.videos  || []));
-    localStorage.setItem('visits',  JSON.stringify(d.visits  || []));
-    localStorage.setItem('films',   JSON.stringify(d.films   || []));
-    localStorage.setItem('voyages', JSON.stringify(d.voyages || []));
-    localStorage.setItem('sorties', JSON.stringify(d.sorties || []));
-    localStorage.setItem('mapPins', JSON.stringify(d.mapPins || []));
+    localStorage.setItem('books',       JSON.stringify(d.books       || []));
+    localStorage.setItem('videos',      JSON.stringify(d.videos      || []));
+    localStorage.setItem('visits',      JSON.stringify(d.visits      || []));
+    localStorage.setItem('films',       JSON.stringify(d.films       || []));
+    localStorage.setItem('trips',       JSON.stringify(d.trips       || []));
+    localStorage.setItem('mapPins',     JSON.stringify(d.mapPins     || []));
+    if (d.packingList && d.packingList.length > 0) {
+      localStorage.setItem('packingList', JSON.stringify(d.packingList));
+    }
     applyingCloud = false;
     renderAll();
   }, err => console.error('Cloud listen', err));
@@ -62,10 +64,10 @@ function renderAll() {
   renderList('visits', 'visit-list');
   renderList('films',  'film-list');
 
-  const tabVisites = document.getElementById('tab-visites');
-  if (tabVisites && tabVisites.classList.contains('active')) {
-    renderArchive('voyages', 'archive-voyages', '✈️');
-    renderArchive('sorties', 'archive-sorties', '🎭');
+  const tabVacances = document.getElementById('tab-vacances');
+  if (tabVacances && tabVacances.classList.contains('active')) {
+    renderVoyages();
+    renderPackingList();
     renderPins();
   }
 
@@ -165,14 +167,10 @@ function showTab(name) {
   document.getElementById('tab-' + name).classList.add('active');
   document.querySelector(`.nav-btn[onclick="showTab('${name}')"]`).classList.add('active');
 
-  if (name === 'livres')  renderArchive('books',  'archive-books',  '📚');
-  if (name === 'videos')  renderArchive('videos', 'archive-videos', '🎬');
-  if (name === 'films')   renderArchive('films',  'archive-films',  '🎥');
-  if (name === 'visites') {
-    renderArchive('voyages', 'archive-voyages', '✈️');
-    renderArchive('sorties', 'archive-sorties', '🎭');
-    renderPins();
-  }
+  if (name === 'livres')   renderArchive('books',  'archive-books',  '📚');
+  if (name === 'videos')   renderArchive('videos', 'archive-videos', '🎬');
+  if (name === 'films')    renderArchive('films',  'archive-films',  '🎥');
+  if (name === 'vacances') { renderVoyages(); renderPackingList(); renderPins(); }
 }
 
 function showSubTab(name) {
@@ -181,6 +179,8 @@ function showSubTab(name) {
   document.getElementById('subtab-' + name).classList.add('active');
   document.querySelector(`.sub-tab[onclick="showSubTab('${name}')"]`).classList.add('active');
   if (name === 'carte') renderPins();
+  if (name === 'preparation') renderPackingList();
+  if (name === 'voyages') renderVoyages();
 }
 
 // ─── Japan progress ────────────────────────────────────────────────────────
@@ -474,6 +474,205 @@ function deleteArchiveItem(key, index, containerId, emoji) {
   data[key].splice(index, 1);
   saveList(key, data[key]);
   renderArchive(key, containerId, emoji);
+}
+
+// ─── Voyages ──────────────────────────────────────────────────────────────
+
+function toggleVoyageForm() {
+  const form = document.getElementById('voyage-form-card');
+  const btn  = document.getElementById('btn-add-voyage');
+  if (!form) return;
+  const open = form.style.display !== 'none';
+  form.style.display = open ? 'none' : 'block';
+  btn.style.display  = open ? 'flex' : 'none';
+  if (!open) document.getElementById('voyage-dest-input').focus();
+}
+
+function saveVoyage() {
+  const dest = document.getElementById('voyage-dest-input').value.trim();
+  if (!dest) return;
+  const dates = document.getElementById('voyage-date-input').value.trim();
+  const notes = document.getElementById('voyage-notes-input').value.trim();
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  trips.unshift({ destination: dest, dates, notes, status: 'planifié', createdAt: new Date().toISOString() });
+  saveList('trips', trips);
+  document.getElementById('voyage-dest-input').value = '';
+  document.getElementById('voyage-date-input').value = '';
+  document.getElementById('voyage-notes-input').value = '';
+  toggleVoyageForm();
+  renderVoyages();
+}
+
+function deleteVoyage(i) {
+  if (!confirm('Supprimer ce voyage ?')) return;
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  trips.splice(i, 1);
+  saveList('trips', trips);
+  renderVoyages();
+}
+
+function toggleVoyageStatus(i) {
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  trips[i].status = trips[i].status === 'planifié' ? 'passé' : 'planifié';
+  saveList('trips', trips);
+  renderVoyages();
+}
+
+function renderVoyages() {
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  const container = document.getElementById('trips-list');
+  if (!container) return;
+
+  if (trips.length === 0) {
+    container.innerHTML = '<p class="empty-msg" style="text-align:center;padding:20px 0">Aucun voyage pour l\'instant.<br>Ajoute ton premier voyage !</p>';
+    return;
+  }
+
+  container.innerHTML = trips.map((v, i) => `
+    <div class="voyage-card ${v.status === 'passé' ? 'voyage-past' : ''}">
+      <div class="voyage-card-top">
+        <span class="voyage-icon">${v.status === 'passé' ? '✅' : '✈️'}</span>
+        <div class="voyage-info">
+          <div class="voyage-destination">${escapeHtml(v.destination)}</div>
+          ${v.dates ? `<div class="voyage-dates">📅 ${escapeHtml(v.dates)}</div>` : ''}
+        </div>
+        <button class="voyage-status-btn ${v.status}" onclick="toggleVoyageStatus(${i})">${v.status === 'passé' ? 'Passé' : 'Planifié'}</button>
+        <button class="btn-archive-delete" onclick="deleteVoyage(${i})">✕</button>
+      </div>
+      ${v.notes ? `<div class="voyage-notes">${escapeHtml(v.notes)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ─── Liste de préparation ─────────────────────────────────────────────────
+
+const DEFAULT_PACKING = [
+  { name: '📋 Documents', items: [
+    { text: 'Passeport / carte d\'identité', checked: false },
+    { text: 'Billets (avion, train…)', checked: false },
+    { text: 'Réservations hôtel', checked: false },
+    { text: 'Assurance voyage', checked: false },
+  ]},
+  { name: '👕 Vêtements', items: [
+    { text: 'T-shirts', checked: false },
+    { text: 'Pantalons', checked: false },
+    { text: 'Chaussures de marche', checked: false },
+  ]},
+  { name: '🧴 Toilette', items: [
+    { text: 'Brosse à dents', checked: false },
+    { text: 'Shampoing', checked: false },
+    { text: 'Crème solaire', checked: false },
+  ]},
+  { name: '💊 Santé', items: [
+    { text: 'Médicaments', checked: false },
+    { text: 'Trousse de secours', checked: false },
+  ]},
+  { name: '🔌 Électronique', items: [
+    { text: 'Chargeurs', checked: false },
+    { text: 'Adaptateur électrique', checked: false },
+    { text: 'Écouteurs', checked: false },
+  ]},
+];
+
+function getPackingList() {
+  const stored = localStorage.getItem('packingList');
+  if (!stored || stored === '[]') {
+    const defaults = JSON.parse(JSON.stringify(DEFAULT_PACKING));
+    localStorage.setItem('packingList', JSON.stringify(defaults));
+    return defaults;
+  }
+  return JSON.parse(stored);
+}
+
+function savePackingList(list) {
+  localStorage.setItem('packingList', JSON.stringify(list));
+  pushToCloud();
+}
+
+function renderPackingList() {
+  const list = getPackingList();
+  const container = document.getElementById('packing-categories');
+  if (!container) return;
+
+  container.innerHTML = list.map((cat, ci) => {
+    const doneCount = cat.items.filter(i => i.checked).length;
+    return `
+    <div class="pack-category">
+      <div class="pack-cat-header">
+        <span class="pack-cat-name">${escapeHtml(cat.name)}</span>
+        <span class="pack-cat-count">${doneCount}/${cat.items.length}</span>
+        <button class="btn-delete-cat" onclick="deleteCategory(${ci})" title="Supprimer">✕</button>
+      </div>
+      <ul class="pack-items">
+        ${cat.items.map((item, ii) => `
+          <li class="pack-item${item.checked ? ' checked' : ''}">
+            <label>
+              <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="togglePackItem(${ci},${ii})">
+              <span>${escapeHtml(item.text)}</span>
+            </label>
+            <button class="btn-delete-pack-item" onclick="deletePackItem(${ci},${ii})">✕</button>
+          </li>`).join('')}
+      </ul>
+      <div class="add-pack-item">
+        <input type="text" id="pack-input-${ci}" placeholder="Ajouter…" onkeydown="if(event.key==='Enter')addPackItem(${ci})">
+        <button onclick="addPackItem(${ci})">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addCategory() {
+  const input = document.getElementById('new-category-input');
+  const name = input.value.trim();
+  if (!name) return;
+  const list = getPackingList();
+  list.push({ name, items: [] });
+  savePackingList(list);
+  renderPackingList();
+  input.value = '';
+}
+
+function deleteCategory(ci) {
+  if (!confirm('Supprimer cette catégorie ?')) return;
+  const list = getPackingList();
+  list.splice(ci, 1);
+  savePackingList(list);
+  renderPackingList();
+}
+
+function addPackItem(ci) {
+  const input = document.getElementById(`pack-input-${ci}`);
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  const list = getPackingList();
+  list[ci].items.push({ text, checked: false });
+  savePackingList(list);
+  renderPackingList();
+  const restored = document.getElementById(`pack-input-${ci}`);
+  if (restored) restored.focus();
+}
+
+function togglePackItem(ci, ii) {
+  const list = getPackingList();
+  list[ci].items[ii].checked = !list[ci].items[ii].checked;
+  savePackingList(list);
+  renderPackingList();
+}
+
+function deletePackItem(ci, ii) {
+  const list = getPackingList();
+  list[ci].items.splice(ii, 1);
+  savePackingList(list);
+  renderPackingList();
+}
+
+function uncheckAll() {
+  if (!confirm('Tout décocher ?')) return;
+  const list = getPackingList();
+  list.forEach(cat => cat.items.forEach(item => { item.checked = false; }));
+  savePackingList(list);
+  renderPackingList();
 }
 
 // ─── Carte Europe – épingles ──────────────────────────────────────────────
