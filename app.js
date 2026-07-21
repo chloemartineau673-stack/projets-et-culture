@@ -478,9 +478,16 @@ function deleteArchiveItem(key, index, containerId, emoji) {
 
 // ─── Voyages ──────────────────────────────────────────────────────────────
 
-let expandedVoyage = null;
+let expandedVoyage    = null;
+let expandedVoyageTab = 'edit'; // 'edit' | 'infos' | 'visites'
 
 const INFO_CHIPS = ['💰 Monnaie','🗣️ Langue','🌡️ Météo','🛂 Visa','🔌 Prise électrique','🏥 Urgences','📞 Ambassade','✈️ Compagnie aérienne','🏨 Hôtel','🚗 Transport'];
+const VISIT_CAT_CHIPS = ['🏛️ Musées','🍜 Restaurants','🌿 Nature','🛍️ Shopping','🏯 Sites historiques','🎭 Spectacles','🏖️ Plages','🎡 Parcs & Loisirs','🍷 Bars & Cafés','🎨 Galeries d\'art'];
+
+function switchVoyageTab(tab) {
+  expandedVoyageTab = tab;
+  renderVoyages();
+}
 
 function toggleVoyageForm() {
   const form = document.getElementById('voyage-form-card');
@@ -525,6 +532,7 @@ function toggleVoyageStatus(i) {
 }
 
 function toggleVoyageExpand(i) {
+  if (expandedVoyage !== i) expandedVoyageTab = 'edit';
   expandedVoyage = expandedVoyage === i ? null : i;
   renderVoyages();
 }
@@ -565,6 +573,48 @@ function deleteVoyageInfo(i, ii) {
   renderVoyages();
 }
 
+// ─── Visites prévues par voyage ────────────────────────────────────────────
+
+function addVoyageVisit(i) {
+  const catInput  = document.getElementById(`vv-cat-${i}`);
+  const nameInput = document.getElementById(`vv-name-${i}`);
+  if (!nameInput) return;
+  const name = nameInput.value.trim();
+  if (!name) return;
+  const cat = catInput.value.trim() || 'Divers';
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  if (!trips[i].visites) trips[i].visites = [];
+  trips[i].visites.push({ cat, name, done: false });
+  saveList('trips', trips);
+  renderVoyages();
+}
+
+function toggleVoyageVisit(i, vi) {
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  trips[i].visites[vi].done = !trips[i].visites[vi].done;
+  saveList('trips', trips);
+  renderVoyages();
+}
+
+function deleteVoyageVisit(i, vi) {
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  trips[i].visites.splice(vi, 1);
+  saveList('trips', trips);
+  renderVoyages();
+}
+
+function uncheckVoyageVisits(i) {
+  const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+  (trips[i].visites || []).forEach(v => { v.done = false; });
+  saveList('trips', trips);
+  renderVoyages();
+}
+
+function prefillVVisitCat(i, cat) {
+  const input = document.getElementById(`vv-cat-${i}`);
+  if (input) { input.value = cat; document.getElementById(`vv-name-${i}`).focus(); }
+}
+
 function renderVoyages() {
   const trips = JSON.parse(localStorage.getItem('trips') || '[]');
   const container = document.getElementById('trips-list');
@@ -578,10 +628,17 @@ function renderVoyages() {
   container.innerHTML = trips.map((v, i) => {
     const isOpen  = expandedVoyage === i;
     const infos   = v.infos || [];
+    const visites = v.visites || [];
     const past    = v.status === 'passé';
 
-    const expandedHtml = isOpen ? `
-      <div class="voyage-expanded-body">
+    const visitBadge = visites.length > 0
+      ? `<span class="voyage-visit-count">${visites.filter(x => x.done).length}/${visites.length}</span>`
+      : '';
+
+    let expandedHtml = '';
+    if (isOpen) {
+      // Tab Modifier
+      const editHtml = expandedVoyageTab === 'edit' ? `
         <div class="voyage-edit-form">
           <input id="vedit-dest-${i}"  value="${escapeHtml(v.destination)}"    placeholder="Destination…">
           <input id="vedit-dates-${i}" value="${escapeHtml(v.dates || '')}"    placeholder="Dates (ex: mars 2026)">
@@ -590,9 +647,11 @@ function renderVoyages() {
             <button class="btn-vedit-save"   onclick="updateVoyage(${i})">💾 Enregistrer</button>
             <button class="btn-vedit-delete" onclick="deleteVoyage(${i})">🗑️ Supprimer</button>
           </div>
-        </div>
+        </div>` : '';
+
+      // Tab Infos pratiques
+      const infosHtml = expandedVoyageTab === 'infos' ? `
         <div class="voyage-infos-section">
-          <h4>📌 Infos pratiques</h4>
           ${infos.length ? `<div class="voyage-infos-list">${infos.map((inf, ii) => `
             <div class="voyage-info-item">
               <span class="info-label">${escapeHtml(inf.label)}</span>
@@ -607,8 +666,58 @@ function renderVoyages() {
             <input id="info-val-${i}" placeholder="Valeur…" onkeydown="if(event.key==='Enter')addVoyageInfo(${i})">
             <button onclick="addVoyageInfo(${i})">+</button>
           </div>
-        </div>
-      </div>` : '';
+        </div>` : '';
+
+      // Tab Visites prévues
+      let visitesHtml = '';
+      if (expandedVoyageTab === 'visites') {
+        const catMap = {};
+        visites.forEach((vis, vi) => {
+          const k = vis.cat || 'Divers';
+          if (!catMap[k]) catMap[k] = [];
+          catMap[k].push({ ...vis, _vi: vi });
+        });
+        visitesHtml = `
+        <div class="voyage-visites-section">
+          ${Object.entries(catMap).map(([cat, items]) => `
+            <div class="vvisit-group">
+              <div class="vvisit-group-header">
+                <span class="vvisit-cat-name">${escapeHtml(cat)}</span>
+                <span class="vvisit-count">${items.filter(x => x.done).length}/${items.length}</span>
+              </div>
+              <ul class="vvisit-list">
+                ${items.map(({name, done, _vi}) => `
+                  <li class="vvisit-item${done ? ' done' : ''}">
+                    <label>
+                      <input type="checkbox" ${done ? 'checked' : ''} onchange="toggleVoyageVisit(${i},${_vi})">
+                      <span>${escapeHtml(name)}</span>
+                    </label>
+                    <button class="btn-delete-vvisit" onclick="deleteVoyageVisit(${i},${_vi})">✕</button>
+                  </li>`).join('')}
+              </ul>
+            </div>`).join('')}
+          <div class="vvisit-cat-chips">
+            ${VISIT_CAT_CHIPS.map(c => `<button class="info-chip" onclick="prefillVVisitCat(${i},\`${c}\`)">${c}</button>`).join('')}
+          </div>
+          <div class="add-vvisit-form">
+            <input id="vv-cat-${i}" placeholder="Catégorie…" onkeydown="if(event.key==='Enter')document.getElementById('vv-name-${i}').focus()">
+            <input id="vv-name-${i}" placeholder="Lieu ou activité…" onkeydown="if(event.key==='Enter')addVoyageVisit(${i})">
+            <button onclick="addVoyageVisit(${i})">+</button>
+          </div>
+          ${visites.length > 0 ? `<button class="btn-uncheck-small" onclick="uncheckVoyageVisits(${i})">↺ Tout décocher</button>` : ''}
+        </div>`;
+      }
+
+      expandedHtml = `
+        <div class="voyage-expanded-body">
+          <div class="voyage-inner-tabs">
+            <button class="vit-btn${expandedVoyageTab === 'edit'    ? ' active' : ''}" onclick="switchVoyageTab('edit')">✏️ Modifier</button>
+            <button class="vit-btn${expandedVoyageTab === 'infos'   ? ' active' : ''}" onclick="switchVoyageTab('infos')">📌 Infos</button>
+            <button class="vit-btn${expandedVoyageTab === 'visites' ? ' active' : ''}" onclick="switchVoyageTab('visites')">📍 Visites</button>
+          </div>
+          ${editHtml}${infosHtml}${visitesHtml}
+        </div>`;
+    }
 
     return `
       <div class="voyage-card ${past ? 'voyage-past' : ''} ${isOpen ? 'voyage-open' : ''}">
@@ -618,6 +727,7 @@ function renderVoyages() {
             <div class="voyage-destination">${escapeHtml(v.destination)}</div>
             ${v.dates ? `<div class="voyage-dates">📅 ${escapeHtml(v.dates)}</div>` : ''}
           </div>
+          ${visitBadge}
           <button class="voyage-status-btn ${v.status}" onclick="event.stopPropagation();toggleVoyageStatus(${i})">${past ? 'Passé' : 'Planifié'}</button>
           <span class="voyage-chevron ${isOpen ? 'open' : ''}">›</span>
         </div>

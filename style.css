@@ -765,6 +765,129 @@ header h1 {
   flex-shrink: 0;
 }
 
+/* ── Onglets internes voyage ──────────────────────────────────── */
+.voyage-inner-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.vit-btn {
+  flex: 1;
+  padding: 7px 4px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--item-bg);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.vit-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* badge visites sur la carte fermée */
+.voyage-visit-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-right: 4px;
+  opacity: 0.85;
+}
+
+/* ── Section visites prévues ──────────────────────────────────── */
+.voyage-visites-section { display: flex; flex-direction: column; gap: 10px; }
+
+.vvisit-group { background: var(--item-bg); border-radius: 10px; overflow: hidden; }
+.vvisit-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--border);
+}
+.vvisit-cat-name { font-weight: 700; font-size: 0.82rem; }
+.vvisit-count { font-size: 0.72rem; color: var(--accent); font-weight: 600; }
+
+.vvisit-list { list-style: none; margin: 0; padding: 0; }
+.vvisit-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  gap: 8px;
+}
+.vvisit-item label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.vvisit-item.done label span {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+.btn-delete-vvisit {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+.btn-delete-vvisit:hover { opacity: 1; color: #e55; }
+
+.vvisit-cat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.add-vvisit-form {
+  display: flex;
+  gap: 6px;
+}
+.add-vvisit-form input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-size: 0.82rem;
+  background: var(--item-bg);
+  color: var(--text);
+  min-width: 0;
+}
+.add-vvisit-form button {
+  padding: 8px 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-uncheck-small {
+  align-self: flex-start;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-uncheck-small:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
 /* ── Liste de préparation ─────────────────────────────────────── */
 .prep-card { padding: 0; overflow: hidden; }
 
